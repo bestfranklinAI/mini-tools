@@ -1,0 +1,9 @@
+{
+  "id": "random-spin",
+  "name": "Random Spin",
+  "description": "Enter names and spin to pick one randomly.",
+  "tags": ["random", "utility", "fun"],
+  "keywords": ["lottery", "raffle", "wheel", "picker"],
+  "icon": "assets/spin.svg",
+  "entry": "RandomSpin.jsx"
+}

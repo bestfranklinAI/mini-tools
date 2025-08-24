@@ -1,0 +1,9 @@
+{
+  "id": "api-tester",
+  "name": "Quick API Test",
+  "description": "Test REST APIs fast: methods, headers, auth, body, and pretty response.",
+  "tags": ["network", "developer"],
+  "keywords": ["api", "http", "rest", "curl", "postman"],
+  "icon": "assets/api.svg",
+  "entry": "APITester.jsx"
+}

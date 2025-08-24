@@ -1,0 +1,9 @@
+{
+  "id": "markdown-preview",
+  "name": "Markdown Preview",
+  "description": "Live Markdown editor with synchronized scroll and code highlighting.",
+  "tags": ["markdown", "preview", "editor"],
+  "keywords": ["md", "sync scroll", "highlight"],
+  "icon": "assets/markdown.svg",
+  "entry": "MarkdownPreview.jsx"
+}

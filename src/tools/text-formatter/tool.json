@@ -1,0 +1,9 @@
+{
+  "id": "text-formatter",
+  "name": "Text Formatter",
+  "description": "Transform text: uppercase, lowercase, slugify, trim.",
+  "tags": ["text", "format", "utility"],
+  "keywords": ["case", "slug", "trim"],
+  "icon": "assets/text.svg",
+  "entry": "TextFormatter.jsx"
+}

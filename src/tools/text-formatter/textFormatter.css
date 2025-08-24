@@ -1,0 +1,20 @@
+.tool.tf { padding: 16px; }
+.tf__controls { display: flex; gap: 8px; margin-bottom: 12px; }
+.tf__controls select {
+  background: var(--bg-elev); color: var(--text); border: 1px solid var(--border); padding: 8px 10px; border-radius: 8px;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+.tf__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tf__input, .tf__output {
+  min-height: 260px; background: var(--bg-elev); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 12px; font: inherit;
+  resize: vertical; outline: none;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
+}
+.tf__input::placeholder { color: var(--muted); }
+.tf__input:focus, .tf__output:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 30%, transparent);
+}
+@media (max-width: 900px) {
+  .tf__grid { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,9 @@
+{
+  "id": "new-tool-id",
+  "name": "New Tool",
+  "description": "One-line description of what this tool does.",
+  "tags": ["utility"],
+  "keywords": ["sample"],
+  "icon": "assets/icon.svg",
+  "entry": "NewTool.jsx"
+}
