@@ -25,6 +25,11 @@ export default function MacDock({ currentId, onPick }) {
   return (
     <div className="dock-wrap">
       <div ref={ref} onMouseMove={onMouseMove} onMouseLeave={onMouseLeave} className="dock">
+        {currentId == null && (
+          <div className="dock-item active" style={{ width: 48, height: 48, display: 'grid', placeItems: 'center' }} title="Home">
+            <span className="dock-indicator" />
+          </div>
+        )}
         {(() => {
           // Discrete, tiered magnification: hovered is biggest; immediate neighbors slightly smaller; then normal
           const base = 48; // fixed box size (we scale with transform to avoid reflow)
@@ -58,6 +63,8 @@ export default function MacDock({ currentId, onPick }) {
                 ref={(el) => (itemRefs.current[idx] = el)}
                 style={{ width: base, height: base, transform: `translateY(${-lift}px) scale(${scale})`, zIndex: Math.round(100 + (3 - Math.min(tier, 3)) * 10) }}
                 title={t.name}
+                aria-label={`Open ${t.name}`}
+                onMouseEnter={() => { try { ToolRegistry.getImporter(t.id)?.(); } catch {} }}
               >
                 {/* icon path relative to tool dir */}
                 <ToolIcon dir={t.dir} iconPath={t.icon} size={Math.max(22, base - 22)} />
@@ -78,5 +85,5 @@ function ToolIcon({ dir, iconPath, size }) {
   const modules = import.meta.glob('../tools/*/assets/*.svg', { eager: true, query: '?url', import: 'default' });
   const url = modules[rel];
   if (!url) return <div style={{ width: size, height: size, background: 'var(--border)', borderRadius: 8 }} />;
-  return <img className="dock-icon" src={url} alt="" width={size} height={size} style={{ objectFit: 'contain', filter: 'drop-shadow(0 2px 6px var(--shadow))' }} />;
+  return <img className="dock-icon" src={url} alt="" width={size} height={size} style={{ objectFit: 'contain' }} />;
 }

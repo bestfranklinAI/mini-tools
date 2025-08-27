@@ -1,4 +1,4 @@
-.tool.pt { padding: 16px; }
+.tool.pt { padding: var(--space-4); }
 .pt__controls { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
 .pt__controls .btn {
   background: var(--bg-elev); color: var(--text); border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; cursor: pointer;

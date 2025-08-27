@@ -7,12 +7,20 @@ class ToolErrorBoundary extends React.Component {
   constructor(props) { super(props); this.state = { hasError: false, error: null }; }
   static getDerivedStateFromError(error) { return { hasError: true, error }; }
   componentDidCatch(error, info) { console.error('Tool crash:', error, info); }
+  componentDidUpdate(prevProps) {
+    if (prevProps.toolId !== this.props.toolId && this.state.hasError) {
+      this.setState({ hasError: false, error: null });
+    }
+  }
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: 24 }}>
+        <div className="tool-error" role="alert" style={{ padding: 24 }}>
           <h3>Something went wrong</h3>
           <pre className="muted" style={{ whiteSpace: 'pre-wrap' }}>{String(this.state.error)}</pre>
+          <div style={{ marginTop: 12 }}>
+            <button className="btn" onClick={() => this.setState({ hasError: false, error: null })}>Reload tool</button>
+          </div>
         </div>
       );
     }
@@ -26,7 +34,7 @@ export default function ToolContainer({ toolId }) {
   const ToolLazy = useMemo(() => importer ? React.lazy(importer) : null, [importer]);
 
   return (
-    <div className="tool-stage">
+  <div className="tool-stage" role="main" aria-live="polite">
       <AnimatePresence mode="wait">
         <FM.div
           key={toolId || 'empty'}
@@ -39,7 +47,7 @@ export default function ToolContainer({ toolId }) {
             <div style={{ padding: 24 }} className="muted">Select a tool to get started.</div>
           ) : (
             <Suspense fallback={<LoadingSpinner />}>
-              <ToolErrorBoundary>
+        <ToolErrorBoundary toolId={toolId}>
                 <ToolLazy />
               </ToolErrorBoundary>
             </Suspense>

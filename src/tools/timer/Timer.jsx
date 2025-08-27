@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import ToolHeader from '../../components/ToolHeader';
 import './timer.css';
 
 function usePref(key, initial) {
@@ -112,12 +113,17 @@ export default function Timer() {
       background: `radial-gradient(1100px 700px at 20% 10%, color-mix(in oklab, var(--accent) 12%, transparent), transparent), linear-gradient(120deg, hsl(${(hue)%360} 70% 50% / 0.10), hsl(${(hue+120)%360} 70% 55% / 0.12))`
     }}>
       <div className="timer-inner">
+        <ToolHeader title="Timer" subtitle="Count up or down with presets" />
         <div className="timer-header">
           <div className="mode-toggle" role="tablist" aria-label="Timer mode">
             <button className={`chip ${mode==='down'?'active':''}`} onClick={() => { setMode('down'); reset(); }}>Count Down</button>
             <button className={`chip ${mode==='up'?'active':''}`} onClick={() => { setMode('up'); reset(); }}>Count Up</button>
           </div>
-          <div className="options">
+          <div className="options"></div>
+        </div>
+        <div className="tool-section">
+          <div className="section-header">Options</div>
+          <div className="section-body" style={{ display: 'flex', gap: 12 }}>
             <label className="switch sm">
               <input type="checkbox" checked={ding} onChange={(e)=>setDing(e.target.checked)} />
               <span>Sound</span>
@@ -137,11 +143,16 @@ export default function Timer() {
         </div>
 
         <div className="timer-controls">
-          <div className="presets">
-            {[1, 5, 10, 15, 25].map((m) => (
-              <button key={m} className="chip" onClick={() => setPreset(m)}>{m}m</button>
-            ))}
-            <CustomInput targetMs={targetMs} setTargetMs={setTargetMs} disabled={mode==='up'} />
+          <div className="tool-section">
+            <div className="section-header">Presets & Custom</div>
+            <div className="section-body">
+              <div className="presets">
+                {[1, 5, 10, 15, 25].map((m) => (
+                  <button key={m} className="chip" onClick={() => setPreset(m)}>{m}m</button>
+                ))}
+                <CustomInput targetMs={targetMs} setTargetMs={setTargetMs} disabled={mode==='up'} />
+              </div>
+            </div>
           </div>
           <div className="actions">
             {!running ? (

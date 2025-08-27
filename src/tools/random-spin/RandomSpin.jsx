@@ -110,7 +110,7 @@ export default function RandomSpin() {
   const pointerLabel = spinning ? 'Spinning…' : (winner || 'Ready');
   
   return (
-    <div className="rs-wrap">
+    <div className="tool rs-wrap">
       <div className="rs-panel">
         <div className="rs-config">
           <div className="rs-input modern">

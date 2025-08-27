@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import ToolHeader from '../../components/ToolHeader';
+import UI from '../../core/UI';
 import './textStats.css';
 
 // Contract
@@ -87,18 +89,19 @@ export default function TextStats() {
       `- UTF-8 Bytes: ${s.bytes}`,
       `- Tokens (approx): ${s.tokens}`,
     ].join('\n');
-    try { await navigator.clipboard.writeText(lines); } catch {}
+  try { await navigator.clipboard.writeText(lines); UI.toast('Copied summary', { type: 'success' }); } catch {}
   };
 
   const pasteFromClipboard = async () => {
     try {
       const v = await navigator.clipboard.readText();
-      if (v != null) setText(v);
+      if (v != null) { setText(v); UI.toast('Pasted from clipboard', { type: 'info' }); }
     } catch {}
   };
 
   return (
     <div className="tool wc">
+      <ToolHeader title="Text Stats" subtitle="Counts for words, lines, bytes, tokens" />
       <div className="wc__controls">
         <label className="wc__chk">
           <input type="checkbox" checked={useSelection} onChange={(e) => setUseSelection(e.target.checked)} />

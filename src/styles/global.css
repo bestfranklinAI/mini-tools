@@ -17,9 +17,10 @@ body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI
 }
 
 .topbar .topbar-actions { display: flex; gap: 8px; align-items: center; }
-.icon-btn { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elev); color: var(--text); cursor: pointer; transition: background-color 140ms ease, border-color 140ms ease, transform 80ms ease; }
+.icon-btn { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elev); color: var(--text); cursor: pointer; transition: background-color 140ms ease, border-color 140ms ease, transform 80ms ease, box-shadow 160ms ease; }
 .icon-btn:hover { border-color: var(--accent); box-shadow: 0 2px 10px var(--shadow); }
 .icon-btn:active { transform: translateY(1px); }
+.icon-btn.active { border-color: var(--accent); box-shadow: 0 2px 12px var(--shadow); }
 
 .search-wrap { position: relative; }
 .search-lead { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); }
@@ -41,7 +42,7 @@ body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI
 
 .tool-stage {
   max-width: 1100px; margin: 0 auto; background: var(--bg-elev); border: 1px solid var(--border);
-  border-radius: var(--radius); min-height: 420px; box-shadow: 0 10px 30px var(--shadow);
+  border-radius: var(--radius); min-height: 420px; box-shadow: var(--shadow-1);
   overflow: hidden;
 }
 
@@ -57,10 +58,23 @@ body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI
 @keyframes dock-in { from { opacity: 0; transform: translateY(8px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
 /* Icon visibility adjustments for dark vs light backgrounds */
-/* Default (dark) theme: slightly boost brightness/contrast for better clarity on dark bg */
-.dock .dock-icon { filter: drop-shadow(0 2px 6px var(--shadow)) brightness(1.05) contrast(1.05); }
+/* Default (dark) theme: slightly boost brightness/contrast; if icons are dark, invert softly */
+.dock .dock-icon { filter: drop-shadow(0 2px 6px var(--shadow)) brightness(1.08) contrast(1.08) saturate(1.05) invert(0.06); }
 /* Light theme should not invert; keep natural assets */
-.light .dock .dock-icon { filter: drop-shadow(0 2px 6px var(--shadow)) brightness(0.98) contrast(1.0); }
+.light .dock .dock-icon { filter: drop-shadow(0 2px 6px var(--shadow)) brightness(0.98) contrast(1.0) invert(0); }
+
+/* Apply similar treatment to any icon marked as .dock-icon outside of dock (e.g., home grid, search) */
+.dock-icon { filter: drop-shadow(0 1px 3px var(--shadow)) brightness(1.06) contrast(1.05) saturate(1.04) invert(0.06); }
+.light .dock-icon { filter: drop-shadow(0 1px 3px var(--shadow)) brightness(0.98) contrast(1.0) invert(0); }
+
+/* Extra resilience: if SVGs are solid black, apply mix-blend and invert in dark mode */
+:root:not(.light) .dock-icon {
+  mix-blend-mode: screen;
+}
+
+/* As a last resort for stubborn black icons, target <img> svg with mask-like effect */
+:root:not(.light) img.dock-icon { filter: invert(0.9) sepia(0) saturate(0.8) hue-rotate(0deg) brightness(1.1) contrast(1.05) drop-shadow(0 1px 3px var(--shadow)) !important; }
+.light img.dock-icon { filter: none !important; }
 
 /* Responsive tools container */
 @media (max-width: 700px) {
@@ -86,6 +100,29 @@ body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI
 
 .muted { color: var(--muted); }
 
+/* Shared tool styles for consistency */
+.tool { padding: var(--space-4); }
+.tool-header { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3); }
+.tool-title { font-size: 18px; font-weight: 700; }
+.tool-subtitle { font-size: 13px; color: var(--muted); }
+.tool-section { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); }
+.tool-section + .tool-section { margin-top: var(--space-3); }
+.tool-section .section-header { padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border); font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; font-size: 12px; }
+.tool-section .section-body { padding: var(--space-3) var(--space-4); }
+
+/* Inputs */
+.input, select, textarea { background: var(--bg-elev); color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; outline: none; transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, color 160ms ease; }
+.input::placeholder, textarea::placeholder { color: var(--muted); }
+.input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 30%, transparent); }
+
+/* Banners */
+.banner { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: color-mix(in oklab, var(--accent) 10%, transparent); }
+.banner.warn { background: color-mix(in oklab, var(--danger) 8%, transparent); }
+
+/* Micro animations for cards and panels */
+.card { background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-1); transition: transform 120ms ease, box-shadow 160ms ease, border-color 160ms ease; }
+.card:hover { transform: translateY(-2px); border-color: var(--accent); }
+
 /* Generic toggle switch control (shared) */
 .switch { display: inline-flex; align-items: center; gap: 8px; background: color-mix(in oklab, var(--bg-elev) 80%, transparent); border: 1px solid var(--border); padding: 6px 10px; border-radius: 999px; }
 .switch input { appearance: none; width: 30px; height: 18px; border-radius: 999px; background: var(--border); position: relative; outline: none; cursor: pointer; transition: background-color 140ms ease; }
@@ -106,3 +143,31 @@ body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI
 .form-input { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elev); color: var(--text); }
 .row { display: flex; gap: 12px; }
 .col { flex: 1; }
+
+/* Command palette */
+.palette-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display: grid; place-items: start center; padding-top: 10vh; z-index: 60; }
+.palette { width: min(760px, 94vw); background: var(--bg-elev); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow-1); overflow: hidden; }
+.palette-input-wrap { padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border); }
+.palette-input { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text); outline: none; }
+.palette-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 30%, transparent); }
+.palette-list { max-height: 60vh; overflow: auto; padding: 6px; }
+.palette-item { width: 100%; display: flex; gap: 12px; align-items: center; border: 0; background: transparent; color: var(--text); text-align: left; padding: 10px; border-radius: 10px; cursor: pointer; }
+.palette-item:hover, .palette-item.active { background: color-mix(in oklab, var(--accent) 12%, transparent); }
+.palette-meta .title { font-weight: 600; }
+.palette-meta .desc { font-size: 12px; color: var(--muted); }
+
+/* Home Tool Grid */
+.home-grid { padding: var(--space-5); }
+.home-grid section { margin-bottom: var(--space-5); }
+.home-grid h3 { margin: 0 0 var(--space-3); font-size: 16px; color: var(--muted); }
+.tool-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-3); }
+.tool-card {
+  display: grid; align-content: start; gap: 8px; padding: var(--space-4);
+  background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius);
+  color: var(--text); text-align: left; cursor: pointer; box-shadow: var(--shadow-1);
+  transition: transform 120ms ease, box-shadow 160ms ease, border-color 140ms ease, background-color 140ms ease;
+}
+.tool-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+.tool-card .icon-wrap { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 10px; background: color-mix(in oklab, var(--accent) 8%, transparent); }
+.tool-card .title { font-weight: 600; }
+.tool-card .desc { font-size: 12px; color: var(--muted); }

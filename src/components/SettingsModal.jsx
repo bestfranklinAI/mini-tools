@@ -7,21 +7,31 @@ export default function SettingsModal({ open, onClose }) {
   const [apiKey, setApiKey] = useState('');
   const [model, setModel] = useState('gpt-4o-mini');
   const [temperature, setTemperature] = useState(0.7);
+  const [theme, setTheme] = useState('system');
+  const [density, setDensity] = useState('comfortable');
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const [startup, setStartup] = useState('last');
 
   useEffect(() => {
     if (open) {
       const llm = Settings.getLLM();
+  const ui = Settings.getUI();
       setEndpoint(llm.endpoint || '');
       setApiKey(llm.apiKey || '');
       setModel(llm.model || 'gpt-4o-mini');
       setTemperature(Number.isFinite(llm.temperature) ? llm.temperature : 0.7);
+  setTheme(ui.theme || 'system');
+  setDensity(ui.density || 'comfortable');
+  setReduceMotion(!!ui.reduceMotion);
+  setStartup(ui.startup || 'last');
     }
   }, [open]);
 
   const save = useCallback(() => {
     Settings.setLLM({ endpoint: endpoint.trim(), apiKey: apiKey.trim(), model: model.trim() || 'gpt-4o-mini', temperature: Number(temperature) });
+  Settings.setUI({ theme, density, reduceMotion, startup });
     onClose?.();
-  }, [endpoint, apiKey, model, temperature, onClose]);
+  }, [endpoint, apiKey, model, temperature, theme, density, reduceMotion, startup, onClose]);
 
   // Save on cmd/ctrl+Enter for convenience
   useEffect(() => {
@@ -71,6 +81,39 @@ export default function SettingsModal({ open, onClose }) {
             <p className="muted" style={{ marginTop: 6 }}>
               Your settings are stored locally in your browser and persist across sessions.
             </p>
+          </section>
+          <section style={{ marginTop: 16 }}>
+            <h4>Appearance & Behavior</h4>
+            <div className="row">
+              <div className="col">
+                <label className="form-label">Theme</label>
+                <select className="form-input" value={theme} onChange={(e) => setTheme(e.target.value)}>
+                  <option value="system">System</option>
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                </select>
+              </div>
+              <div className="col">
+                <label className="form-label">Density</label>
+                <select className="form-input" value={density} onChange={(e) => setDensity(e.target.value)}>
+                  <option value="comfortable">Comfortable</option>
+                  <option value="compact">Compact</option>
+                </select>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col">
+                <label className="form-label">Motion</label>
+                <label className="switch"><input type="checkbox" checked={reduceMotion} onChange={(e) => setReduceMotion(e.target.checked)} /><span>Reduce motion</span></label>
+              </div>
+              <div className="col">
+                <label className="form-label">Startup</label>
+                <select className="form-input" value={startup} onChange={(e) => setStartup(e.target.value)}>
+                  <option value="last">Open last tool</option>
+                  <option value="home">Open Home</option>
+                </select>
+              </div>
+            </div>
           </section>
             </div>
             <div className="modal-footer">

@@ -1,4 +1,4 @@
-.tool.tf { padding: 16px; }
+.tool.tf { padding: var(--space-4); }
 .tf__controls { display: flex; gap: 8px; margin-bottom: 12px; }
 .tf__controls select {
   background: var(--bg-elev); color: var(--text); border: 1px solid var(--border); padding: 8px 10px; border-radius: 8px;

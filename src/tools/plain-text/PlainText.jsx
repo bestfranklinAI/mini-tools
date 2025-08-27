@@ -1,5 +1,7 @@
 import './plainText.css';
 import { useMemo, useState } from 'react';
+import UI from '../../core/UI';
+import ToolHeader from '../../components/ToolHeader';
 
 function stripHtmlTags(t) {
   return t.replace(/<[^>]+>/g, '');
@@ -104,6 +106,7 @@ export default function PlainText() {
   const copyOut = async () => {
     try {
       await navigator.clipboard.writeText(output);
+  UI.toast('Copied cleaned text', { type: 'success' });
     } catch (e) {
       console.warn('Copy failed', e);
     }
@@ -112,7 +115,7 @@ export default function PlainText() {
   const pasteIn = async () => {
     try {
       const text = await navigator.clipboard.readText();
-      if (text) setInput((prev) => (prev ? prev + '\n' + text : text));
+  if (text) { setInput((prev) => (prev ? prev + '\n' + text : text)); UI.toast('Pasted from clipboard', { type: 'info' }); }
     } catch (e) {
       console.warn('Paste failed (permissions?)', e);
     }
@@ -140,6 +143,7 @@ export default function PlainText() {
 
   return (
     <div className="tool pt">
+      <ToolHeader title="Plain Text Cleaner" subtitle="Strip markup and sanitize text" />
       <div className="pt__controls">
         <button className="btn" type="button" onClick={pasteIn} title="Paste from clipboard">
           Paste

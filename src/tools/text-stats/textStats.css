@@ -1,4 +1,4 @@
-.tool.wc { padding: 16px; display: flex; flex-direction: column; gap: 12px; height: 100%; }
+.tool.wc { padding: var(--space-4); display: flex; flex-direction: column; gap: 12px; height: 100%; }
 
 .wc__controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .wc__chk { display: flex; align-items: center; gap: 6px; color: var(--text); }

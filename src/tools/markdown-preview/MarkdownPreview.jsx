@@ -1,5 +1,6 @@
 import './markdownPreview.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import ToolHeader from '../../components/ToolHeader';
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js/lib/common';
 
@@ -184,16 +185,13 @@ export default function MarkdownPreview() {
   }, [html]);
 
   return (
-    <div className="mdp-wrap">
-      <div className="mdp-toolbar">
-        <div className="left">
-          <strong>Markdown Preview</strong>
-        </div>
-        <div className="right">
+    <div className="tool mdp-wrap">
+      <ToolHeader title="Markdown Preview" subtitle="Live preview with synchronized scroll" actions={(
+        <>
           <button className="btn" onClick={() => setInput(DEFAULT_MD)}>Reset Demo</button>
           <button className="btn" onClick={() => setInput('')}>Clear</button>
-        </div>
-      </div>
+        </>
+      )} />
 
       <div className="mdp-split">
         <div className="mdp-pane">
@@ -214,7 +212,7 @@ export default function MarkdownPreview() {
           </div>
         </div>
       </div>
-    </div>
+  </div>
   );
 }
 

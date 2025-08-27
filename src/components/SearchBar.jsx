@@ -23,15 +23,9 @@ export default function SearchBar({ onPick }) {
 
   useEffect(() => { debounced(q); }, [q, debounced]);
 
-  // keyboard handling (arrows / enter / esc). Also add global Cmd+K to focus.
+  // keyboard handling (arrows / enter / esc).
   useEffect(() => {
     const onKey = (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        inputRef.current?.focus();
-        setOpen(true);
-        return;
-      }
       if (!open) return;
       if (e.key === 'Escape') { setOpen(false); setActiveIdx(-1); return; }
       if (e.key === 'ArrowDown') { e.preventDefault(); setActiveIdx((i) => Math.min(i + 1, results.length - 1)); }
@@ -77,7 +71,7 @@ export default function SearchBar({ onPick }) {
                 key={r.id}
                 className={`search-item${idx === activeIdx ? ' active' : ''}`}
                 onMouseDown={() => onPick(r.id)}
-                onMouseEnter={() => setActiveIdx(idx)}
+                onMouseEnter={() => { setActiveIdx(idx); try { ToolRegistry.getImporter(r.id)?.(); } catch {} }}
                 role="option"
                 aria-selected={idx === activeIdx}
               >
@@ -103,5 +97,5 @@ function ToolIcon({ toolId, size }) {
   const modules = import.meta.glob('../tools/*/assets/*.svg', { eager: true, query: '?url', import: 'default' });
   const url = modules[rel];
   if (!url) return <span style={{ width: size, height: size }} />;
-  return <img src={url} alt="" width={size} height={size} style={{ objectFit: 'contain', filter: 'drop-shadow(0 1px 3px var(--shadow))' }} />;
+  return <img className="dock-icon" src={url} alt="" width={size} height={size} style={{ objectFit: 'contain' }} />;
 }

@@ -1,5 +1,6 @@
 import './apiTester.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import ToolHeader from '../../components/ToolHeader';
 
 const METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
 
@@ -125,7 +126,8 @@ export default function APITester() {
   const [view, setView] = useState('pretty'); // pretty | raw | headers
 
   return (
-    <div className="api-wrap">
+    <div className="tool api-wrap">
+      <ToolHeader title="API Tester" subtitle="Send HTTP requests quickly" />
       <div className="api-toolbar">
         <div className="left">
           <select value={method} onChange={(e) => setMethod(e.target.value)} className="api-method">

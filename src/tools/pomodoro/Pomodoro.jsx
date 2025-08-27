@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import ToolHeader from '../../components/ToolHeader';
 import './pomodoro.css';
 
 function usePref(key, initial) {
@@ -101,6 +102,7 @@ export default function Pomodoro() {
       background: `radial-gradient(1100px 700px at 20% 10%, color-mix(in oklab, var(--accent) 12%, transparent), transparent), linear-gradient(120deg, hsl(${(hue)%360} 70% 50% / 0.10), hsl(${(hue+80)%360} 70% 55% / 0.12))`
     }}>
       <div className="pomo-inner">
+        <ToolHeader title="Pomodoro" subtitle="Focus cycles with short/long breaks" />
         <div className="pomo-top">
           <div className="phase-label">
             <span className={`dot ${phase}`}></span>
@@ -128,15 +130,20 @@ export default function Pomodoro() {
           <button className="btn" onClick={skip}>Skip</button>
         </div>
 
-        <div className="pomo-settings">
-          <Setting label="Focus" value={focusMin} setValue={setFocusMin} min={1} max={180} suffix="m" />
-          <Setting label="Short" value={shortMin} setValue={setShortMin} min={1} max={60} suffix="m" />
-          <Setting label="Long" value={longMin} setValue={setLongMin} min={5} max={120} suffix="m" />
-          <Setting label="Cycles→Long" value={cyclesUntilLong} setValue={setCyclesUntilLong} min={2} max={12} />
-          <label className="switch sm">
-            <input type="checkbox" checked={autoStart} onChange={(e)=>{ setAutoStart(e.target.checked); }} />
-            <span>Auto start next</span>
-          </label>
+        <div className="tool-section">
+          <div className="section-header">Settings</div>
+          <div className="section-body">
+            <div className="pomo-settings">
+              <Setting label="Focus" value={focusMin} setValue={setFocusMin} min={1} max={180} suffix="m" />
+              <Setting label="Short" value={shortMin} setValue={setShortMin} min={1} max={60} suffix="m" />
+              <Setting label="Long" value={longMin} setValue={setLongMin} min={5} max={120} suffix="m" />
+              <Setting label="Cycles→Long" value={cyclesUntilLong} setValue={setCyclesUntilLong} min={2} max={12} />
+              <label className="switch sm">
+                <input type="checkbox" checked={autoStart} onChange={(e)=>{ setAutoStart(e.target.checked); }} />
+                <span>Auto start next</span>
+              </label>
+            </div>
+          </div>
         </div>
       </div>
   {/* sound via WebAudio */}
