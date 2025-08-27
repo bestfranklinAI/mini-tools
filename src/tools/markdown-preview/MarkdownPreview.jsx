@@ -3,6 +3,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import ToolHeader from '../../components/ToolHeader';
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js/lib/common';
+import markdownItKatex from 'markdown-it-katex';
+import 'katex/dist/katex.min.css';
 
 // Markdown Preview tool with synchronized scrolling between editor and preview.
 export default function MarkdownPreview() {
@@ -19,6 +21,17 @@ export default function MarkdownPreview() {
       linkify: true,
       typographer: true,
     });
+
+    // Enable LaTeX math via KaTeX (inline $...$ and block $$...$$)
+    m.use(markdownItKatex, {
+      throwOnError: false,
+      errorColor: '#cc0000',
+      output: 'html',
+      strict: 'warn',
+      trust: false,
+      macros: {}
+    });
+
 
     // Custom fence renderer to include data-line and syntax highlighting
     const fence = (tokens, idx) => {
@@ -68,8 +81,109 @@ export default function MarkdownPreview() {
 
   // Render with line anchors using markdown-it tokens
   const html = useMemo(() => {
+    // Normalize TeX delimiters before parsing so that \[...\] and \(...\) work
+    const normalizeMathDelimiters = (src) => {
+      if (!src) return src;
+
+      // State for fenced code blocks (``` or ~~~)
+      let inFence = false;
+      let fenceMarker = '';
+
+      const lines = src.split(/\n/);
+      const outLines = [];
+
+      const replaceOutsideInline = (line) => {
+        let i = 0;
+        let inInline = false;
+        let inlineTicks = 0;
+        let buf = '';
+        let out = '';
+
+        const applyRepl = (s) => {
+          // Replace \\[ ... \\] => $$ ... $$ (display math)
+          s = s
+            .replace(/(^|[^\\])\\\[/g, '$1$$')
+            .replace(/(^|[^\\])\\\]/g, '$1$$');
+          // Also support \( ... \) => $ ... $ (inline math)
+          s = s
+            .replace(/(^|[^\\])\\\(/g, '$1$')
+            .replace(/(^|[^\\])\\\)/g, '$1$');
+          return s;
+        };
+
+        while (i < line.length) {
+          if (!inInline && line[i] === '`') {
+            // entering inline code span of N backticks
+            // flush buffer with replacements
+            out += applyRepl(buf);
+            buf = '';
+            let j = i;
+            while (j < line.length && line[j] === '`') j++;
+            inlineTicks = j - i;
+            inInline = true;
+            out += line.slice(i, j);
+            i = j;
+            continue;
+          }
+          if (inInline) {
+            // look for closing backticks of the same length
+            if (line[i] === '`') {
+              let j = i;
+              while (j < line.length && line[j] === '`') j++;
+              const ticks = j - i;
+              if (ticks === inlineTicks) {
+                inInline = false;
+                out += line.slice(i, j);
+                i = j;
+                continue;
+              }
+            }
+            // inside inline code: copy as-is
+            out += line[i++];
+            continue;
+          }
+          // normal text region, accumulate into buffer
+          buf += line[i++];
+        }
+        // flush remainder
+        out += applyRepl(buf);
+        return out;
+      };
+
+  for (const rawLine of lines) {
+        const line = rawLine;
+        const fenceMatch = line.match(/^(\s*)(`{3,}|~{3,})(.*)$/);
+        if (fenceMatch) {
+          const marker = fenceMatch[2];
+          if (!inFence) {
+            inFence = true;
+            fenceMarker = marker;
+          } else if (marker[0] === fenceMarker[0]) {
+            // closing fence only if same marker type (backtick vs tilde)
+            inFence = false;
+            fenceMarker = '';
+          }
+          outLines.push(line);
+          continue;
+        }
+        if (inFence) {
+          outLines.push(line);
+          continue;
+        }
+        // Skip typical indented code blocks (leading 4 spaces or a tab)
+        if (/^(\t| {4,})/.test(line)) {
+          outLines.push(line);
+          continue;
+        }
+        outLines.push(replaceOutsideInline(line));
+      }
+
+      return outLines.join('\n');
+    };
+
     const env = {};
-    const tokens = md.parse(input || '', env);
+    const normalized = normalizeMathDelimiters(input || '');
+    const tokens = md.parse(normalized, env);
     // Add data-line attribute to all block-level tokens for better sync
     for (let i = 0; i < tokens.length; i++) {
       const t = tokens[i];
@@ -84,6 +198,31 @@ export default function MarkdownPreview() {
   const previewRef = useRef(null);
   const scrollTimeoutRef = useRef(null);
   const activeScrollerRef = useRef(null); // 'editor' | 'preview'
+
+  const handlePaste = (e) => {
+    const ta = editorRef.current;
+    if (!ta) return;
+    const pasted = e.clipboardData?.getData('text/plain');
+    if (!pasted) return;
+    // Convert \[...\] to $$...$$ in pasted text
+    const converted = pasted
+      .replace(/\\\[/g, '$$')
+      .replace(/\\\]/g, '$$');
+    // If no change, let default paste happen
+    if (converted === pasted) return;
+    e.preventDefault();
+    const start = ta.selectionStart ?? input.length;
+    const end = ta.selectionEnd ?? start;
+    const next = (input ?? '').slice(0, start) + converted + (input ?? '').slice(end);
+    setInput(next);
+    // Restore caret after React updates value
+    setTimeout(() => {
+      try {
+        const pos = start + converted.length;
+        ta.selectionStart = ta.selectionEnd = pos;
+      } catch {}
+    }, 0);
+  };
 
   const handleScroll = (scroller) => {
     if (scroller === 'editor') {
@@ -144,6 +283,7 @@ export default function MarkdownPreview() {
             className="mdp-editor"
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            onPaste={handlePaste}
             onScroll={onEditorScroll}
             wrap="soft"
             spellCheck="false"
@@ -188,4 +328,12 @@ hello('world');
 | Beta   |   123 |
 
 > Blockquotes are supported too.
+
+### Math
+
+Inline math with \\( ... \\): e.g., \\(a_i = x^2 + y_1\\) and subscripts/superscripts.
+
+Display math with \\[ ... \\]:
+
+\\[ \int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi} \\]
 `;
