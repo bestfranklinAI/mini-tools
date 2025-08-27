@@ -16,7 +16,7 @@ export default function Toasts() {
 
   if (items.length === 0) return null;
   return (
-    <div style={{ position: 'fixed', right: 16, bottom: 16 + 92, display: 'grid', gap: 10, zIndex: 80 }}>
+    <div className="toasts">
       {items.map((t) => (
         <div key={t.id} className={`banner ${t.type || 'info'}`}>{t.message}</div>
       ))}

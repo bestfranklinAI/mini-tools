@@ -1,5 +1,5 @@
-.timer-tool { position: relative; min-height: 520px; display: grid; place-items: center; }
-.timer-inner { position: relative; z-index: 1; width: 100%; max-width: 980px; padding: clamp(18px, 3.5vw, 36px); display: grid; gap: 22px; }
+.timer-tool { position: relative; min-height: clamp(300px, 52vh, 480px); max-height: 90vh; display: grid; place-items: center; overflow: hidden; }
+.timer-inner { position: relative; z-index: 1; width: 100%; max-width: 980px; padding: clamp(14px, 3vw, 28px); display: grid; gap: clamp(14px, 2.8vw, 22px); }
 
 .timer-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .mode-toggle { display: flex; gap: 8px; }
@@ -10,13 +10,13 @@
 .options { display: flex; gap: 10px; align-items: center; }
 .switch.sm { transform: scale(0.92); transform-origin: right center; }
 
-.timer-display { position: relative; display: grid; place-items: center; min-height: 400px; }
-.time-main { position: relative; z-index: 1; display: flex; align-items: baseline; gap: clamp(12px, 2vw, 18px); line-height: 1; letter-spacing: -0.02em; text-shadow: 0 8px 30px var(--shadow); }
-.time-text { font-weight: 800; font-variation-settings: 'wght' 800; font-size: clamp(56px, 12vw, 120px); background: linear-gradient(180deg, var(--text), color-mix(in oklab, var(--text) 65%, transparent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.timer-display { position: relative; display: grid; place-items: center; min-height: clamp(200px, 36vh, 320px); max-height: 40vh; padding: 10px; }
+.time-main { position: relative; z-index: 2; display: flex; align-items: baseline; gap: clamp(10px, 2vw, 16px); line-height: 1; letter-spacing: -0.02em; text-shadow: 0 8px 30px var(--shadow); }
+.time-text { font-weight: 800; font-variation-settings: 'wght' 800; font-size: clamp(36px, 12vmin, 80px); background: linear-gradient(180deg, var(--text), color-mix(in oklab, var(--text) 65%, transparent)); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: -0.02em; }
 
-.ring { position: absolute; inset: 0; margin: auto; filter: drop-shadow(0 6px 26px var(--shadow)); opacity: 0.5; z-index: 0; pointer-events: none; }
+.ring { position: absolute; inset: 0; margin: auto; width: clamp(200px, 40vmin, 280px); height: clamp(200px, 40vmin, 280px); max-width: 70%; max-height: 70%; filter: drop-shadow(0 6px 26px var(--shadow)); opacity: 0.5; z-index: 1; pointer-events: none; }
 
-.timer-controls { display: grid; gap: 14px; }
+.timer-controls { display: grid; gap: 14px; overflow-y: auto; max-height: 30vh; }
 .presets { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .custom-input { display: inline-flex; gap: 8px; background: color-mix(in oklab, var(--bg-elev) 80%, transparent); border: 1px solid var(--border); padding: 6px 10px; border-radius: 999px; }
 .num { display: inline-flex; align-items: center; gap: 6px; }
@@ -30,5 +30,14 @@
 .btn.warning { border: 1px solid color-mix(in oklab, var(--danger) 60%, var(--border)); background: color-mix(in oklab, var(--danger) 10%, var(--bg-elev)); }
 
 @media (max-width: 640px) {
-  .timer-tool { min-height: 460px; }
+  .timer-tool { min-height: clamp(340px, 58vh, 460px); max-height: 95vh; }
+  .ring { width: clamp(180px, 35vmin, 240px); height: clamp(180px, 35vmin, 240px); }
+  .time-text { font-size: clamp(32px, 10vmin, 64px); }
+}
+
+@media (max-height: 740px) {
+  .timer-tool { min-height: clamp(280px, 45vh, 400px); }
+  .timer-display { min-height: clamp(160px, 28vh, 240px); max-height: 35vh; }
+  .timer-controls { max-height: 25vh; }
+  .ring { width: clamp(160px, 30vmin, 220px); height: clamp(160px, 30vmin, 220px); }
 }

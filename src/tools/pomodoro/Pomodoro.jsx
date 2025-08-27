@@ -172,7 +172,7 @@ function ProgressRing({ progress, phase }) {
   const dash = Math.max(0.0001, c * progress);
   const color = phase === 'focus' ? 'var(--accent)' : (phase === 'short' ? 'var(--accent-2)' : 'color-mix(in oklab, var(--accent-2) 80%, var(--accent))');
   return (
-    <svg className="ring" width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+    <svg className="ring" width="100%" height="100%" viewBox={`0 0 ${size} ${size}`} preserveAspectRatio="xMidYMid meet">
       <circle cx={size/2} cy={size/2} r={r} stroke="var(--border)" strokeWidth={stroke} fill="none" />
       <circle cx={size/2} cy={size/2} r={r} stroke={color}
         strokeWidth={stroke} strokeDasharray={`${dash} ${c}`} strokeLinecap="round" fill="none"

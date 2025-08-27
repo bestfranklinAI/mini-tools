@@ -207,7 +207,7 @@ function ProgressRing({ progress }) {
   const size = 380; const stroke = 8; const r = (size - stroke) / 2; const c = 2 * Math.PI * r;
   const dash = Math.max(0.0001, c * progress);
   return (
-    <svg className="ring" width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+    <svg className="ring" width="100%" height="100%" viewBox={`0 0 ${size} ${size}`} preserveAspectRatio="xMidYMid meet">
       <defs>
         <linearGradient id="grad2" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="var(--accent)" />
@@ -215,7 +215,7 @@ function ProgressRing({ progress }) {
         </linearGradient>
       </defs>
   <circle cx={size/2} cy={size/2} r={r} stroke="var(--border)" strokeWidth={stroke} fill="none" />
-      <circle cx={size/2} cy={size/2} r={r} stroke="url(#grad2)" strokeWidth={stroke}
+  <circle cx={size/2} cy={size/2} r={r} stroke="url(#grad2)" strokeWidth={stroke}
         strokeDasharray={`${dash} ${c}`} strokeLinecap="round" fill="none"
         transform={`rotate(-90 ${size/2} ${size/2})`} />
     </svg>

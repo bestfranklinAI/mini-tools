@@ -6,6 +6,12 @@ import hljs from 'highlight.js/lib/common';
 
 // Markdown Preview tool with synchronized scrolling between editor and preview.
 export default function MarkdownPreview() {
+  // Debug mode - can be toggled via button
+  const [debugMode, setDebugMode] = useState(false);
+  
+  const log = (...args) => {
+    if (debugMode) console.log('[MarkdownPreview]', ...args);
+  };
   // Create markdown-it instance with custom code renderers that embed data-line anchors for sync
   const md = useMemo(() => {
     const m = new MarkdownIt({
@@ -30,7 +36,7 @@ export default function MarkdownPreview() {
       } catch {
         highlighted = m.utils.escapeHtml(content);
       }
-      const lineAttr = token.map ? ` data-line="${token.map[0]}"` : '';
+      const lineAttr = token.map ? ` data-line="${token.map[0] + 1}"` : '';
       const langClass = lang ? ` language-${m.utils.escapeHtml(lang)}` : '';
       return `<pre class="hljs${langClass}"${lineAttr}><code>${highlighted}</code></pre>`;
     };
@@ -40,7 +46,7 @@ export default function MarkdownPreview() {
     m.renderer.rules.code_block = (tokens, idx) => {
       const token = tokens[idx];
       const content = token.content || '';
-      const lineAttr = token.map ? ` data-line="${token.map[0]}"` : '';
+      const lineAttr = token.map ? ` data-line="${token.map[0] + 1}"` : '';
       return `<pre class="hljs"${lineAttr}><code>${m.utils.escapeHtml(content)}</code></pre>`;
     };
 
@@ -64,11 +70,11 @@ export default function MarkdownPreview() {
   const html = useMemo(() => {
     const env = {};
     const tokens = md.parse(input || '', env);
-    // Add data-line attribute to block-level opens so headings/paragraphs/lists are anchorable
+    // Add data-line attribute to all block-level tokens for better sync
     for (let i = 0; i < tokens.length; i++) {
       const t = tokens[i];
-      if (t.map && (t.type.endsWith('_open'))) {
-        t.attrSet('data-line', String(t.map[0]));
+      if (t.map && (t.type.endsWith('_open') || t.level === 0)) {
+        t.attrSet('data-line', String(t.map[0] + 1)); // Use 1-based line numbers
       }
     }
     return md.renderer.render(tokens, md.options, env);
@@ -76,122 +82,60 @@ export default function MarkdownPreview() {
 
   const editorRef = useRef(null);
   const previewRef = useRef(null);
-  const rafRef = useRef(0);
-  const syncingRef = useRef(null); // 'editor' | 'preview' | null
+  const scrollTimeoutRef = useRef(null);
+  const activeScrollerRef = useRef(null); // 'editor' | 'preview'
 
-  // Helpers for precise mapping using data-line anchors
-  const getAnchors = () => Array.from(previewRef.current?.querySelectorAll('[data-line]') || []);
+  const handleScroll = (scroller) => {
+    if (scroller === 'editor') {
+      if (activeScrollerRef.current === 'preview') return;
+      activeScrollerRef.current = 'editor';
+      
+      const editor = editorRef.current;
+      const preview = previewRef.current;
+      if (!editor || !preview) return;
 
-  const getContainerScrollTopForAnchor = (el, container) => {
-    const cRect = container.getBoundingClientRect();
-    const aRect = el.getBoundingClientRect();
-    return aRect.top - cRect.top + container.scrollTop;
-  };
+      const scrollPercent = editor.scrollTop / (editor.scrollHeight - editor.clientHeight);
+      preview.scrollTop = scrollPercent * (preview.scrollHeight - preview.clientHeight);
+    } else { // scroller === 'preview'
+      if (activeScrollerRef.current === 'editor') return;
+      activeScrollerRef.current = 'preview';
 
-  const lineHeightPxRef = useRef(22);
-  useEffect(() => {
-    const ta = editorRef.current;
-    if (!ta) return;
-    const cs = getComputedStyle(ta);
-    const lh = parseFloat(cs.lineHeight);
-    if (!Number.isNaN(lh)) lineHeightPxRef.current = lh;
-  }, []);
+      const editor = editorRef.current;
+      const preview = previewRef.current;
+      if (!editor || !preview) return;
 
-  const getTopLineFromEditor = () => {
-    const ta = editorRef.current;
-    if (!ta) return 0;
-    const lh = Math.max(1, lineHeightPxRef.current);
-    return Math.floor(ta.scrollTop / lh);
-  };
-
-  const scrollPreviewToEditor = () => {
-    const container = previewRef.current;
-    const ta = editorRef.current;
-    if (!container || !ta) return;
-    const anchors = getAnchors();
-    if (anchors.length === 0) return;
-    const topLine = getTopLineFromEditor();
-    // find nearest prev and next anchors around topLine
-    let prev = anchors[0];
-    let next = null;
-    for (let i = 0; i < anchors.length; i++) {
-      const l = parseInt(anchors[i].getAttribute('data-line') || '0', 10);
-      if (l <= topLine) prev = anchors[i];
-      if (l > topLine) { next = anchors[i]; break; }
+      const scrollPercent = preview.scrollTop / (preview.scrollHeight - preview.clientHeight);
+      editor.scrollTop = scrollPercent * (editor.scrollHeight - editor.clientHeight);
     }
-    const prevLine = parseInt(prev.getAttribute('data-line') || '0', 10);
-    const prevTop = getContainerScrollTopForAnchor(prev, container);
-    if (!next) { container.scrollTop = prevTop; return; }
-    const nextLine = parseInt(next.getAttribute('data-line') || '0', 10);
-    const nextTop = getContainerScrollTopForAnchor(next, container);
-    const spanLines = Math.max(1, nextLine - prevLine);
-    const within = Math.max(0, Math.min(spanLines, topLine - prevLine));
-    const ratio = within / spanLines;
-    container.scrollTop = prevTop + ratio * (nextTop - prevTop);
+
+    clearTimeout(scrollTimeoutRef.current);
+    scrollTimeoutRef.current = setTimeout(() => {
+      activeScrollerRef.current = null;
+    }, 150); // Cooldown period
   };
 
-  const scrollEditorToPreview = () => {
-    const container = previewRef.current;
-    const ta = editorRef.current;
-    if (!container || !ta) return;
-    const anchors = getAnchors();
-    if (anchors.length === 0) return;
-    const cRect = container.getBoundingClientRect();
-    // topmost visible anchor
-    let idx = anchors.findIndex((a) => a.getBoundingClientRect().top >= cRect.top - 1);
-    if (idx === -1) idx = anchors.length - 1;
-    let curr = anchors[idx];
-    let next = anchors[idx + 1] || null;
-    const currLine = parseInt(curr.getAttribute('data-line') || '0', 10);
-    if (!next) {
-      ta.scrollTop = currLine * Math.max(1, lineHeightPxRef.current);
-      return;
-    }
-    const nextLine = parseInt(next.getAttribute('data-line') || '0', 10);
-    const currTop = getContainerScrollTopForAnchor(curr, container);
-    const nextTop = getContainerScrollTopForAnchor(next, container);
-    const span = Math.max(1, nextTop - currTop);
-    const within = Math.max(0, Math.min(span, container.scrollTop - currTop));
-    const ratio = within / span;
-    const targetLine = Math.round(currLine + ratio * (nextLine - currLine));
-    ta.scrollTop = targetLine * Math.max(1, lineHeightPxRef.current);
-  };
-
-  const onEditorScroll = () => {
-    if (syncingRef.current === 'preview') return;
-    syncingRef.current = 'editor';
-    cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(() => {
-      scrollPreviewToEditor();
-      syncingRef.current = null;
-    });
-  };
-
-  const onPreviewScroll = () => {
-    if (syncingRef.current === 'editor') return;
-    syncingRef.current = 'preview';
-    cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(() => {
-      scrollEditorToPreview();
-      syncingRef.current = null;
-    });
-  };
+  const onEditorScroll = () => handleScroll('editor');
+  const onPreviewScroll = () => handleScroll('preview');
 
   // Keep scroll positions aligned after re-rendering preview (when input changes)
   useEffect(() => {
-    cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(() => scrollPreviewToEditor());
-    return () => cancelAnimationFrame(rafRef.current);
+    const editor = editorRef.current;
+    const preview = previewRef.current;
+    if (!editor || !preview) return;
+
+    // Preserve scroll position on re-render
+    const scrollPercent = editor.scrollTop / (editor.scrollHeight - editor.clientHeight);
+    
+    // Use a timeout to allow the preview to render and get its new scrollHeight
+    setTimeout(() => {
+      preview.scrollTop = scrollPercent * (preview.scrollHeight - preview.clientHeight);
+    }, 50);
+    
   }, [html]);
 
   return (
     <div className="tool mdp-wrap">
-      <ToolHeader title="Markdown Preview" subtitle="Live preview with synchronized scroll" actions={(
-        <>
-          <button className="btn" onClick={() => setInput(DEFAULT_MD)}>Reset Demo</button>
-          <button className="btn" onClick={() => setInput('')}>Clear</button>
-        </>
-      )} />
+      <ToolHeader title="Markdown Preview" subtitle="Live preview with synchronized scroll" />
 
       <div className="mdp-split">
         <div className="mdp-pane">

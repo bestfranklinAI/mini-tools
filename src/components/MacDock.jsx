@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
+import { Home as HomeIcon } from 'lucide-react';
 import ToolRegistry from '../core/ToolRegistry';
 
 export default function MacDock({ currentId, onPick }) {
@@ -25,10 +26,17 @@ export default function MacDock({ currentId, onPick }) {
   return (
     <div className="dock-wrap">
       <div ref={ref} onMouseMove={onMouseMove} onMouseLeave={onMouseLeave} className="dock">
-        {currentId == null && (
-          <div className="dock-item active" style={{ width: 48, height: 48, display: 'grid', placeItems: 'center' }} title="Home">
-            <span className="dock-indicator" />
-          </div>
+        {(
+          <button
+            className={`dock-item${currentId == null ? ' active' : ''}`}
+            style={{ width: 48, height: 48, display: 'grid', placeItems: 'center' }}
+            title="Home"
+            aria-label="Go to Home"
+            onClick={() => onPick(null)}
+          >
+            <HomeIcon size={26} className="dock-icon" aria-hidden="true" />
+            {currentId == null ? <span className="dock-indicator" /> : null}
+          </button>
         )}
         {(() => {
           // Discrete, tiered magnification: hovered is biggest; immediate neighbors slightly smaller; then normal

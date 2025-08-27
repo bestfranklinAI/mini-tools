@@ -61,7 +61,7 @@ function ToolIcon({ dir, iconPath }) {
   const url = modules[rel];
   return (
     <div className="icon-wrap">
-  {url ? <img className="dock-icon" src={url} alt="" width={36} height={36} /> : <span style={{ width: 36, height: 36 }} />}
+  {url ? <img className="dock-icon" src={url} alt="" width={36} height={36} style={{ objectFit: 'contain' }} /> : <span style={{ width: 36, height: 36, borderRadius: 8, background: 'var(--border)' }} />}
     </div>
   );
 }
