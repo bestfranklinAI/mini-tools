@@ -199,6 +199,7 @@ export default function MarkdownPreview() {
   const scrollTimeoutRef = useRef(null);
   const activeScrollerRef = useRef(null); // 'editor' | 'preview'
 
+
   const handlePaste = (e) => {
     const ta = editorRef.current;
     if (!ta) return;
@@ -232,9 +233,17 @@ export default function MarkdownPreview() {
       const editor = editorRef.current;
       const preview = previewRef.current;
       if (!editor || !preview) return;
-
-      const scrollPercent = editor.scrollTop / (editor.scrollHeight - editor.clientHeight);
-      preview.scrollTop = scrollPercent * (preview.scrollHeight - preview.clientHeight);
+      const eScrollable = editor.scrollHeight > editor.clientHeight + 1;
+      const pScrollable = preview.scrollHeight > preview.clientHeight + 1;
+      if (!eScrollable || !pScrollable) {
+        // If either side can't scroll, skip syncing to avoid NaN/Inf
+        return;
+      }
+      const eDen = editor.scrollHeight - editor.clientHeight;
+      const pDen = preview.scrollHeight - preview.clientHeight;
+      if (eDen <= 0 || pDen <= 0) return;
+      const scrollPercent = editor.scrollTop / eDen;
+      preview.scrollTop = scrollPercent * pDen;
     } else { // scroller === 'preview'
       if (activeScrollerRef.current === 'editor') return;
       activeScrollerRef.current = 'preview';
@@ -242,9 +251,16 @@ export default function MarkdownPreview() {
       const editor = editorRef.current;
       const preview = previewRef.current;
       if (!editor || !preview) return;
-
-      const scrollPercent = preview.scrollTop / (preview.scrollHeight - preview.clientHeight);
-      editor.scrollTop = scrollPercent * (editor.scrollHeight - editor.clientHeight);
+      const eScrollable = editor.scrollHeight > editor.clientHeight + 1;
+      const pScrollable = preview.scrollHeight > preview.clientHeight + 1;
+      if (!eScrollable || !pScrollable) {
+        return;
+      }
+      const eDen = editor.scrollHeight - editor.clientHeight;
+      const pDen = preview.scrollHeight - preview.clientHeight;
+      if (eDen <= 0 || pDen <= 0) return;
+      const scrollPercent = preview.scrollTop / pDen;
+      editor.scrollTop = scrollPercent * eDen;
     }
 
     clearTimeout(scrollTimeoutRef.current);
@@ -263,11 +279,19 @@ export default function MarkdownPreview() {
     if (!editor || !preview) return;
 
     // Preserve scroll position on re-render
-    const scrollPercent = editor.scrollTop / (editor.scrollHeight - editor.clientHeight);
+    const eDen = editor.scrollHeight - editor.clientHeight;
+    const pDen = preview.scrollHeight - preview.clientHeight;
+    const eScrollable = eDen > 0;
+    const pScrollable = pDen > 0;
+    if (!eScrollable || !pScrollable) return;
+    const scrollPercent = editor.scrollTop / eDen;
     
     // Use a timeout to allow the preview to render and get its new scrollHeight
     setTimeout(() => {
-      preview.scrollTop = scrollPercent * (preview.scrollHeight - preview.clientHeight);
+      const newDen = preview.scrollHeight - preview.clientHeight;
+      if (newDen > 0) {
+        preview.scrollTop = scrollPercent * newDen;
+      }
     }, 50);
     
   }, [html]);
@@ -276,7 +300,7 @@ export default function MarkdownPreview() {
     <div className="tool mdp-wrap">
       <ToolHeader title="Markdown Preview" subtitle="Live preview with synchronized scroll" />
 
-      <div className="mdp-split">
+  <div className="mdp-split">
         <div className="mdp-pane">
           <textarea
             ref={editorRef}

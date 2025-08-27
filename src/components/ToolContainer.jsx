@@ -34,7 +34,7 @@ export default function ToolContainer({ toolId }) {
   const ToolLazy = useMemo(() => importer ? React.lazy(importer) : null, [importer]);
 
   return (
-  <div className="tool-stage" role="main" aria-live="polite">
+  <div className="tool-stage" role="main" aria-live="polite" style={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
       <AnimatePresence mode="wait">
         <FM.div
           key={toolId || 'empty'}
@@ -42,13 +42,16 @@ export default function ToolContainer({ toolId }) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -6 }}
           transition={{ duration: 0.18, ease: 'easeOut' }}
+          style={{ display: 'flex', flexDirection: 'column', minHeight: 0, height: '100%' }}
         >
           {!ToolLazy ? (
             <div style={{ padding: 24 }} className="muted">Select a tool to get started.</div>
           ) : (
             <Suspense fallback={<LoadingSpinner />}>
         <ToolErrorBoundary toolId={toolId}>
-                <ToolLazy />
+                <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, height: '100%' }}>
+                  <ToolLazy />
+                </div>
               </ToolErrorBoundary>
             </Suspense>
           )}
