@@ -23,9 +23,10 @@ The app sets theme and density automatically in `App.jsx`:
 
 ## Layout primitives
 
-Your tool is rendered inside `.tool-stage` which provides an elevated panel with constrained height and scrolling. Inside your tool:
+Your tool is rendered inside `.tool-stage` which provides an elevated panel with constrained height and scrolling. This means vertical space is limited and your content must manage its own internal scroll. Inside your tool:
 
 - Wrap content with a container class and keep overflow within the tool, not the page.
+- Make one primary area scrollable inside your tool (e.g., the main content panel) instead of letting the whole tool grow taller than the stage. Use `min-height: 0` on flex/grid parents to enable child scrolling.
 - Recommended structure:
   - Optional header using the shared component `ToolHeader`
   - A content container with your UI
@@ -38,6 +39,26 @@ Shared layout classes you can use (from components.css/global.css):
 - Utilities: `.grid`, `.flex`, `.card`, `.chip`, `.switch`, `.badge`, `.btn`
 
 Keep scrollable regions inside your tool’s content; don’t expand beyond the `.tool-stage` height.
+
+### Height-aware, responsive layouts (important)
+
+Because the tool stage has a tight vertical height, design your layout to fit and scroll internally:
+
+- Prefer a split layout: a left panel for the live preview and a right panel with tabs for controls. Each panel should be a flex column with `min-height: 0` and the panel body should use `overflow: auto`.
+- Avoid stacking many full-width sections top-to-bottom. If you must stack, collapse/accordion or use tabs to reduce vertical sprawl.
+- For previews that need to scale, measure the container and render content to fit instead of using fixed pixel sizes. Example: compute `renderSize = Math.min(maxAllowedWidth, requestedSize)` on resize.
+- Use responsive breakpoints to collapse two columns into one on small screens and keep the most important information first (usually the preview).
+- Ensure inputs and buttons wrap on small screens; don’t rely on long single lines.
+
+CSS tips to prevent overflow:
+- On a grid/flex parent that contains a scrolling child, set `min-height: 0` on the parent.
+- On the scrollable content area, set `overflow: auto` and avoid fixed heights. Use padding instead of large margins to preserve space.
+- Keep expensive backgrounds under control; use an absolutely positioned layer with `filter: blur(...)` if needed and keep the preview content above it.
+
+Accessibility and mobile:
+- All interactive controls must be reachable without horizontal scroll.
+- Target sizes: buttons/inputs should remain comfortably tappable when density is compact.
+- Test in both themes and at narrow widths; don’t let controls overflow the viewport.
 
 ## Components and states
 
@@ -119,3 +140,36 @@ Use the central UI helper for ephemeral feedback.
 ---
 
 If you need a new reusable primitive (button variant, badge, layout), add it to `components.css` rather than custom-styling in one tool.
+
+## Full-height contract for tools (must follow)
+
+All tools must fill the vertical space of `.tool-stage` and keep scrolling inside their own content area.
+
+- Root container: `display: flex; flex-direction: column; height: 100%; min-height: 0;`
+- Any grid/flex parent of a scrollable child: add `min-height: 0`
+- The main content area: `flex: 1; overflow: auto; min-height: 0`
+- Prefer a 2-column split (preview | controls) with responsive collapse on small screens
+
+Quick template:
+
+```jsx
+<div className="tool mytool" style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
+  <ToolHeader title="My Tool" />
+  <div className="mytool__layout" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)', flex: 1, minHeight: 0 }}>
+    <div className="tool-section" style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      <div className="section-header">Preview</div>
+      <div className="section-body" style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>…</div>
+    </div>
+    <div className="tool-section" style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      <div className="section-header">Controls</div>
+      <div className="section-body" style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>…</div>
+    </div>
+  </div>
+</div>
+```
+
+Checklist for PRs:
+- Root fills height (100%) and uses min-height: 0
+- Exactly one scrollable area in the main region (no page scroll from tool)
+- Works in both themes; preview scales to fit container
+- Responsive down to mobile; no horizontal scroll; controls wrap as needed

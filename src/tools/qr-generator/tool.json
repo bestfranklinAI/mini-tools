@@ -1,0 +1,9 @@
+{
+  "id": "qr-generator",
+  "name": "QR Code Generator",
+  "description": "Create QR codes from URLs with colors, logo, and blurred background.",
+  "tags": ["image", "qr", "generator", "branding"],
+  "keywords": ["qrcode", "logo", "blur", "download", "png"],
+  "icon": "assets/icon.svg",
+  "entry": "QRGenerator.jsx"
+}

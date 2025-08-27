@@ -1,0 +1,72 @@
+/* Full-height tool layout */
+.qrg { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+
+.qrg .section-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+
+.qrg__topbar {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.qrg__url {
+  flex: 1;
+}
+
+.qrg__layout { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); min-height: 0; flex: 1; }
+
+.qrg__panel { display: flex; flex-direction: column; min-height: 0; }
+.qrg__panelBody { flex: 1; min-height: 0; overflow: auto; display: flex; }
+
+.qrg__previewWrap { position: relative; border-radius: var(--radius-lg); overflow: hidden; padding: var(--space-4); display: grid; place-items: center; min-height: 280px; flex: 1; min-width: 0; }
+
+.qrg__bg {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  transition: filter var(--transition-base);
+}
+
+.qrg__overlay {
+  position: absolute; inset: 0;
+}
+
+.qrg__qr {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  box-shadow: var(--shadow);
+}
+
+.qrg__qr svg,
+.qrg__qr canvas { display: block; }
+
+.qrg__hiddenCanvas { position: absolute; left: -9999px; top: -9999px; opacity: 0; pointer-events: none; }
+.qrg__logoHole { position: absolute; transform: translate(-50%, -50%); left: 50%; top: 50%; background: var(--bg); border-radius: 8px; }
+.qrg__logoImg { position: absolute; transform: translate(-50%, -50%); left: 50%; top: 50%; object-fit: contain; border-radius: 6px; }
+
+.qrg__grid .section-body { gap: var(--space-4); }
+.qrg__controls { display: grid; gap: var(--space-3); }
+.qrg__field { display: grid; gap: var(--space-2); }
+.qrg__check { grid-auto-flow: column; align-items: center; justify-content: start; grid-auto-columns: max-content; gap: var(--space-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  .qrg__bg { transition: none; }
+}
+
+@media (max-width: 900px) {
+  .qrg__layout { grid-template-columns: 1fr; }
+}
