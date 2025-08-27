@@ -1,20 +1,76 @@
-.tool.tf { padding: var(--space-4); }
-.tf__controls { display: flex; gap: 8px; margin-bottom: 12px; }
-.tf__controls select {
-  background: var(--bg-elev); color: var(--text); border: 1px solid var(--border); padding: 8px 10px; border-radius: 8px;
-  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+.tf-tool { 
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
-.tf__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.tf__input, .tf__output {
-  min-height: 260px; background: var(--bg-elev); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 12px; font: inherit;
-  resize: vertical; outline: none;
-  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
+
+.tf-controls { 
+  display: flex; 
+  gap: var(--space-2); 
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
-.tf__input::placeholder { color: var(--muted); }
-.tf__input:focus, .tf__output:focus {
+
+.tf-controls select {
+  background: var(--bg-elev); 
+  color: var(--text); 
+  border: 1px solid var(--border); 
+  padding: var(--space-2) var(--space-3); 
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-base);
+  outline: none;
+}
+
+.tf-controls select:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 30%, transparent);
+  box-shadow: var(--shadow-focus);
 }
+
+.tf-grid { 
+  flex: 1;
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 0;
+  min-height: 0;
+}
+
+.tf-input, .tf-output {
+  width: 100%;
+  height: 100%;
+  background: var(--bg); 
+  color: var(--text); 
+  border: none;
+  border-radius: 0;
+  padding: var(--space-4); 
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.5;
+  resize: none; 
+  outline: none;
+  transition: all var(--transition-base);
+}
+
+.tf-input {
+  border-right: 1px solid var(--border);
+}
+
+.tf-input::placeholder { 
+  color: var(--muted); 
+}
+
+.tf-input:focus, .tf-output:focus {
+  background: color-mix(in oklab, var(--accent) 3%, var(--bg));
+}
+
 @media (max-width: 900px) {
-  .tf__grid { grid-template-columns: 1fr; }
+  .tf-grid { 
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+  
+  .tf-input {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
 }

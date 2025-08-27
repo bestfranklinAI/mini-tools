@@ -17,8 +17,8 @@ export default function TextFormatter() {
   }, [input, op]);
 
   return (
-    <div className="tool tf">
-      <div className="tf__controls">
+    <div className="tf-tool">
+      <div className="tf-controls">
         <select value={op} onChange={(e) => setOp(e.target.value)}>
           <option value="upper">Uppercase</option>
           <option value="lower">Lowercase</option>
@@ -26,9 +26,9 @@ export default function TextFormatter() {
           <option value="trim">Trim</option>
         </select>
       </div>
-      <div className="tf__grid">
-        <textarea className="tf__input" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type here…" />
-        <textarea className="tf__output" value={output} readOnly />
+      <div className="tf-grid">
+        <textarea className="tf-input" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type here…" />
+        <textarea className="tf-output" value={output} readOnly />
       </div>
     </div>
   );

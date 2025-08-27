@@ -1,38 +1,178 @@
-.clock-tool { position: relative; min-height: 520px; max-height: 90vh; display: grid; place-items: center; overflow: hidden; }
-.clock-tool.floating { animation: subtle-float 18s ease-in-out infinite alternate; }
-@keyframes subtle-float { 0% { transform: translateY(0) } 100% { transform: translateY(-6px) } }
-
-.particles { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.6; }
-
-.clock-inner { position: relative; z-index: 1; width: 100%; max-width: 980px; padding: clamp(18px, 3.5vw, 36px); display: grid; gap: 22px; }
-
-.time-wrap { position: relative; display: grid; place-items: center; min-height: 300px; max-height: 60vh; }
-
-.time-main { position: relative; z-index: 1; display: flex; align-items: baseline; gap: clamp(12px, 2vw, 18px); line-height: 1; letter-spacing: -0.02em; text-shadow: 0 8px 30px var(--shadow); }
-.time-text { font-weight: 800; font-variation-settings: 'wght' 800; font-size: clamp(48px, 14vw, 120px); background: linear-gradient(180deg, var(--text), color-mix(in oklab, var(--text) 65%, transparent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.time-sec { font-size: clamp(20px, 4vw, 42px); color: var(--muted); transform: translateY(10%); }
-.time-suffix { font-size: clamp(14px, 2.5vw, 24px); color: var(--accent-2); letter-spacing: 0.06em; transform: translateY(18%); }
-
-
-.date-row { text-align: center; font-size: clamp(16px, 2.6vw, 22px); color: var(--muted); }
-
-.controls { margin-top: 8px; display: flex; gap: 12px; justify-content: center; }
-.switch { display: inline-flex; align-items: center; gap: 8px; background: color-mix(in oklab, var(--bg-elev) 80%, transparent); border: 1px solid var(--border); padding: 6px 10px; border-radius: 999px; }
-.switch input { appearance: none; width: 30px; height: 18px; border-radius: 999px; background: var(--border); position: relative; outline: none; cursor: pointer; transition: background-color 140ms ease; }
-.switch input::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--text); transition: transform 160ms ease; box-shadow: 0 2px 8px var(--shadow); }
-.switch input:checked { background: color-mix(in oklab, var(--accent) 40%, var(--border)); }
-.switch input:checked::after { transform: translateX(12px); }
-.switch span { color: var(--text); font-size: 13px; }
-
-@media (max-width: 640px) {
-  .clock-tool { min-height: 460px; max-height: 95vh; }
-  .time-text { font-size: clamp(36px, 12vw, 80px); }
-  .time-sec { font-size: clamp(16px, 3.5vw, 32px); }
-  .time-suffix { font-size: clamp(12px, 2.2vw, 20px); }
+.clock-tool { 
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
 }
 
-@media (max-height: 640px) {
-  .clock-tool { min-height: 380px; }
-  .time-wrap { min-height: 240px; max-height: 50vh; }
-  .time-text { font-size: clamp(36px, 10vw, 64px); }
+.clock-tool.floating { 
+  animation: subtle-float 18s ease-in-out infinite alternate; 
+}
+
+@keyframes subtle-float { 
+  0% { transform: translateY(0) } 
+  100% { transform: translateY(-6px) } 
+}
+
+.particles { 
+  position: absolute; 
+  inset: 0; 
+  width: 100%; 
+  height: 100%; 
+  pointer-events: none; 
+  opacity: 0.6; 
+}
+
+.clock-inner { 
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4);
+  gap: var(--space-5);
+  justify-content: center;
+  min-height: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.time-wrap { 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 200px;
+  max-height: 300px;
+}
+
+.time-main { 
+  display: flex; 
+  align-items: baseline; 
+  gap: clamp(10px, 2vw, 16px); 
+  line-height: 1; 
+  letter-spacing: -0.02em; 
+  text-shadow: 0 6px 24px var(--shadow);
+}
+
+.time-text { 
+  font-weight: 800; 
+  font-variation-settings: 'wght' 800; 
+  font-size: clamp(40px, 12vw, 96px); 
+  background: linear-gradient(180deg, var(--text), color-mix(in oklab, var(--text) 65%, transparent)); 
+  -webkit-background-clip: text; 
+  background-clip: text; 
+  color: transparent; 
+}
+
+.time-sec { 
+  font-size: clamp(18px, 4vw, 36px); 
+  color: var(--muted); 
+  transform: translateY(10%); 
+}
+
+.time-suffix { 
+  font-size: clamp(14px, 2.5vw, 22px); 
+  color: var(--accent-2); 
+  letter-spacing: 0.06em; 
+  transform: translateY(18%); 
+}
+
+.date-row { 
+  text-align: center; 
+  font-size: clamp(16px, 2.6vw, 20px); 
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.controls { 
+  display: flex; 
+  gap: var(--space-3); 
+  justify-content: center;
+  flex-shrink: 0;
+}
+.switch { 
+  display: inline-flex; 
+  align-items: center; 
+  gap: var(--space-2); 
+  background: color-mix(in oklab, var(--bg-elev) 80%, transparent); 
+  border: 1px solid var(--border); 
+  padding: 6px 12px; 
+  border-radius: 999px; 
+}
+
+.switch input { 
+  appearance: none; 
+  width: 30px; 
+  height: 18px; 
+  border-radius: 999px; 
+  background: var(--border); 
+  position: relative; 
+  outline: none; 
+  cursor: pointer; 
+  transition: background-color var(--transition-base); 
+}
+
+.switch input::after { 
+  content: ''; 
+  position: absolute; 
+  top: 2px; 
+  left: 2px; 
+  width: 14px; 
+  height: 14px; 
+  border-radius: 50%; 
+  background: var(--text); 
+  transition: transform var(--transition-base); 
+  box-shadow: 0 2px 8px var(--shadow); 
+}
+
+.switch input:checked { 
+  background: color-mix(in oklab, var(--accent) 40%, var(--border)); 
+}
+
+.switch input:checked::after { 
+  transform: translateX(12px); 
+}
+
+.switch span { 
+  color: var(--text); 
+  font-size: 13px; 
+}
+
+@media (max-width: 640px) {
+  .clock-inner {
+    padding: var(--space-3);
+    gap: var(--space-4);
+  }
+  
+  .time-text { 
+    font-size: clamp(32px, 10vw, 72px); 
+  }
+  
+  .time-sec { 
+    font-size: clamp(14px, 3vw, 28px); 
+  }
+  
+  .time-suffix { 
+    font-size: clamp(12px, 2vw, 18px); 
+  }
+  
+  .time-wrap {
+    min-height: 160px;
+    max-height: 240px;
+  }
+}
+
+@media (max-height: 600px) {
+  .clock-inner {
+    gap: var(--space-3);
+  }
+  
+  .time-wrap { 
+    min-height: 140px; 
+    max-height: 200px; 
+  }
+  
+  .time-text { 
+    font-size: clamp(28px, 8vw, 56px); 
+  }
 }
