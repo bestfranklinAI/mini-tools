@@ -1,201 +1,99 @@
-/* Random Spin styles aligned with global design tokens */
-.rs-wrap {
-  padding: 18px;
-  max-width: 1100px;
-  margin: 0 auto;
+/* RandomSpin tool styles - scoped and using shared primitives */
+
+.randomspin .rs-input-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: var(--space-2);
 }
 
-/* Main layout */
-.rs-panel {
+@media (max-width: 560px) {
+  .randomspin .rs-input-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.randomspin .rs-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  min-height: 36px;
+}
+
+.randomspin .chip.hit {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 16%, var(--bg-elev));
+  box-shadow: var(--shadow-1);
+}
+
+.randomspin .chip-x {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  margin-left: 6px;
+  cursor: pointer;
+}
+
+.randomspin .chip-x:hover {
+  color: var(--danger);
+  background: color-mix(in oklab, var(--danger) 8%, transparent);
+}
+
+.randomspin .rs-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 28px;
+  grid-template-columns: 1fr 0.8fr;
+  gap: var(--space-3);
   align-items: start;
 }
 
-/* Input section styling */
-.rs-config {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  padding: 20px;
-  background: var(--bg-elev);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: 0 8px 24px var(--shadow);
+@media (max-width: 980px) {
+  .randomspin .rs-grid { grid-template-columns: 1fr; }
 }
 
-.rs-input.modern {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 12px;
-}
+.randomspin .rs-wheel-col { display: flex; flex-direction: column; gap: var(--space-3); }
+.randomspin .rs-actions { display: flex; align-items: center; gap: var(--space-3); }
 
-.rs-input-field {
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text);
-  outline: none;
-  font-size: 0.95rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.rs-input-field:focus {
+.randomspin .rs-winner .badge {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent);
+  background: color-mix(in oklab, var(--accent) 12%, transparent);
 }
 
-.rs-input-field::placeholder {
-  color: var(--muted);
+.randomspin .badge.pulse {
+  animation: winnerPulse 700ms ease-out;
 }
 
-/* Button styling */
-.rs-btn {
-  padding: 12px 20px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: rgba(40, 40, 40, 0.7);
-  color: var(--text);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
+@keyframes winnerPulse {
+  0% { transform: scale(0.96); box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 40%, transparent); }
+  60% { transform: scale(1.04); box-shadow: 0 0 0 6px color-mix(in oklab, var(--accent) 10%, transparent); }
+  100% { transform: scale(1); box-shadow: none; }
 }
 
-.rs-btn:hover:not(:disabled) {
-  background: rgba(60, 60, 60, 0.9);
-  transform: translateY(-2px);
-}
-
-.rs-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.rs-btn-add {
-  background: color-mix(in oklab, var(--accent) 15%, var(--bg-elev));
-  border-color: var(--accent);
-}
-
-.rs-btn-clear {
-  background: color-mix(in oklab, var(--danger) 15%, var(--bg-elev));
-  border-color: var(--danger);
-}
-
-.rs-btn-spin {
-  background: color-mix(in oklab, #3ccf91 18%, var(--bg-elev));
-  border-color: #3ccf91;
-  padding: 14px 22px;
-  font-size: 1.05rem;
-  width: 100%;
-}
-
-/* Tags display */
-.rs-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  min-height: 60px;
-  padding: 10px 0;
-}
-
-.rs-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--bg-elev);
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
-}
-
-.rs-tag.hit {
-  border-color: var(--accent);
-  box-shadow: 0 6px 16px var(--shadow);
-  background: color-mix(in oklab, var(--accent) 20%, var(--bg-elev));
-}
-
-.rs-tag-x {
-  background: transparent;
-  border: none;
-  color: var(--muted);
-  font-size: 18px;
-  cursor: pointer;
-  border-radius: 999px;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.rs-tag-x:hover {
-  color: var(--danger);
-  background: color-mix(in oklab, var(--danger) 8%, transparent);
-  transform: scale(1.1);
-}
-
-.rs-empty-message {
-  color: var(--muted);
-  font-style: italic;
-  padding: 10px;
-}
-
-/* Wheel container - responsive */
-.rs-wheel-container {
+/* Wheel */
+.randomspin .rs-wheel-container {
   position: relative;
   width: 100%;
-  max-width: 500px;
+  max-width: 360px;
   aspect-ratio: 1;
   margin: 0 auto;
 }
 
-@media (max-width: 1100px) {
-  .rs-panel {
-    grid-template-columns: 1fr;
-    gap: 30px;
-  }
-  
-  .rs-wheel-container {
-    max-width: 70vw;
-  }
-}
-
 @media (max-width: 700px) {
-  .rs-wheel-container {
-    max-width: 90vw;
-  }
-  
-  .rs-config {
-    padding: 15px;
-  }
-  
-  .rs-input-field {
-    padding: 12px 14px;
-    font-size: 0.9rem;
-  }
-  
-  .rs-btn {
-    padding: 10px 16px;
-    font-size: 0.9rem;
-  }
+  .randomspin .rs-wheel-container { max-width: min(78vw, 340px); }
 }
 
-/* Wheel pointer */
-.rs-pointer {
+.randomspin .rs-pointer {
   position: absolute;
   top: -10px;
   left: 50%;
   transform: translateX(-50%);
-  width: 0;
-  height: 0;
+  width: 0; height: 0;
   border-left: 14px solid transparent;
   border-right: 14px solid transparent;
   border-bottom: 22px solid var(--accent);
@@ -204,7 +102,7 @@
 }
 
 @media (max-width: 700px) {
-  .rs-pointer {
+  .randomspin .rs-pointer {
     border-left-width: 10px;
     border-right-width: 10px;
     border-bottom-width: 16px;
@@ -212,25 +110,20 @@
   }
 }
 
-/* Wheel styling */
-.rs-wheel {
+.randomspin .rs-wheel {
   position: relative;
   width: 100%;
   height: 100%;
   border-radius: 50%;
   border: 10px solid var(--border);
-  box-shadow:
-    inset 0 0 50px rgba(0,0,0,0.25),
-    0 18px 40px var(--shadow);
+  box-shadow: inset 0 0 50px rgba(0,0,0,0.25), 0 18px 40px var(--shadow);
   transition: transform 120ms ease;
-  display: grid;
-  place-items: center;
   overflow: hidden;
   box-sizing: border-box;
   background: var(--bg);
 }
 
-.rs-wheel::after {
+.randomspin .rs-wheel::after {
   content: "";
   position: absolute;
   width: 18px;
@@ -240,41 +133,31 @@
   border-radius: 50%;
   box-shadow: 0 4px 10px var(--shadow);
   z-index: 2;
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
 }
 
-/* Legend styles */
-.rs-legend { margin-top: 10px; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
-.rs-legend-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--border); background: var(--bg-elev); border-radius: 12px; }
-.rs-legend-item.hit { border-color: var(--accent); box-shadow: 0 4px 14px var(--shadow); }
-.rs-swatch { width: 14px; height: 14px; border-radius: 4px; box-shadow: inset 0 0 0 2px rgba(255,255,255,0.1); }
-.rs-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* Additional responsive adjustments */
-@media (max-width: 480px) {
-  .rs-wrap {
-    padding: 12px;
-  }
-  
-  .rs-config {
-    gap: 14px;
-  }
-  
-  .rs-input.modern {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-  
-  .rs-tags {
-    gap: 8px;
-  }
-  
-  .rs-tag {
-    padding: 6px 12px;
-    font-size: 0.8rem;
-  }
-  
-  .rs-btn-spin {
-    padding: 12px 18px;
-    font-size: 1rem;
-  }
+/* Legend */
+.randomspin .rs-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-2);
+  align-content: start;
 }
+
+.randomspin .rs-legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-elev);
+  border-radius: var(--radius-sm);
+}
+
+.randomspin .rs-legend-item.hit {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-1);
+}
+
+.randomspin .rs-swatch { width: 14px; height: 14px; border-radius: 4px; box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--bg) 40%, transparent); }
+.randomspin .rs-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

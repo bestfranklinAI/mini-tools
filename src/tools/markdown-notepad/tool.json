@@ -1,0 +1,9 @@
+{
+  "id": "markdown-notepad",
+  "name": "Markdown Notepad",
+  "description": "Quick notes with persistent storage, markdown, and interactive checklists.",
+  "tags": ["notes", "markdown", "productivity"],
+  "icon": "assets/icon.svg",
+  "entry": "MarkdownNotepad.jsx",
+  "keywords": ["notepad", "todo", "task list", "checklist", "localStorage"]
+}

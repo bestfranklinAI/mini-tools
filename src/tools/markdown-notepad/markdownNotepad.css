@@ -1,0 +1,32 @@
+.mknp-wrap { display: flex; flex-direction: column; gap: 12px; height: 100%; min-height: 0; flex: 1; }
+.mknp-topbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mknp-actions { display: flex; gap: 8px; align-items: center; }
+.mknp-split { flex: 1; min-height: 0; height: 100%; display: grid; grid-template-columns: 280px 1fr; gap: 12px; }
+.mknp-pane { min-height: 0; display: flex; flex-direction: column; height: 100%; }
+.mknp-notes { border: 1px solid var(--border); background: var(--bg-elev); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.mknp-notes-header { padding: 10px 12px; border-bottom: 1px solid var(--border); font-weight: 600; }
+.mknp-list { overflow: auto; flex: 1; }
+.mknp-item { padding: 10px 12px; border-bottom: 1px solid var(--border); cursor: pointer; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 6px; }
+.mknp-item:hover { background: color-mix(in oklab, var(--accent) 8%, transparent); }
+.mknp-item.active { background: color-mix(in oklab, var(--accent) 14%, transparent); }
+.mknp-item-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mknp-item-time { font-size: 12px; opacity: 0.7; }
+.mknp-editor-wrap { border: 1px solid var(--border); background: var(--bg-elev); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.mknp-editor-body { flex: 1; min-height: 0; display: flex; }
+.mknp-textarea, .mknp-preview { width: 100%; height: 100%; padding: 12px; font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; background: transparent; color: var(--text); flex: 1; min-height: 0; }
+.mknp-textarea { border: none; outline: none; resize: none; }
+.mknp-preview { overflow: auto; }
+.mknp-empty { opacity: 0.7; font-style: italic; padding: 10px; }
+.mknp-note-header { padding: 10px 12px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; align-items: center; }
+.mknp-title-input { flex: 1; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 8px; padding: 8px 10px; outline: none; }
+.mknp-btn { padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-elev); color: var(--text); cursor: pointer; }
+.mknp-btn:hover { border-color: var(--accent); }
+.mknp-danger { color: #d33; border-color: color-mix(in oklab, #d33 40%, var(--border)); }
+.mknp-toolbar-spacer { flex: 1; }
+.mknp-markdown article { padding: 0 2px; }
+.mknp-markdown .task-list-item { list-style: none; }
+.mknp-markdown input[type="checkbox"] { margin-right: 8px; }
+.mknp-toggle { display: inline-flex; align-items: center; gap: 8px; }
+@media (max-width: 900px) {
+  .mknp-split { grid-template-columns: 1fr; grid-template-rows: 220px 1fr; }
+}

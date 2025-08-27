@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import ToolHeader from '../../components/ToolHeader';
 import './randomSpin.css';
 
 // Contract
@@ -8,19 +9,23 @@ import './randomSpin.css';
 export default function RandomSpin() {
   const [input, setInput] = useState('');
   const [names, setNames] = useState(() => {
+    // migrate from old key -> new namespaced key
+    const NEW_KEY = 'tool:random-spin:names';
+    const OLD_KEY = 'randomSpin:names';
     try {
-      const raw = localStorage.getItem('randomSpin:names');
-      return raw ? JSON.parse(raw) : ['Alice', 'Bob', 'Charlie'];
-    } catch {
-      return ['Alice', 'Bob', 'Charlie'];
-    }
+      const rawNew = localStorage.getItem(NEW_KEY);
+      if (rawNew) return JSON.parse(rawNew);
+      const rawOld = localStorage.getItem(OLD_KEY);
+      if (rawOld) return JSON.parse(rawOld);
+    } catch {}
+    return ['Alice', 'Bob', 'Charlie'];
   });
   const [spinning, setSpinning] = useState(false);
   const [winner, setWinner] = useState(null);
   const [angle, setAngle] = useState(0);
   
   useEffect(() => {
-    localStorage.setItem('randomSpin:names', JSON.stringify(names));
+    try { localStorage.setItem('tool:random-spin:names', JSON.stringify(names)); } catch {}
   }, [names]);
   
   const cleaned = useMemo(() =>
@@ -28,16 +33,10 @@ export default function RandomSpin() {
     [names]
   );
 
-  // Stable color assignment based on name hashing for legend and wheel slices
-  const palette = useMemo(() => (
-    ['#7aa2f7', '#7dcfff', '#3ccf91', '#ffd166', '#ef476f', '#a78bfa', '#06b6d4', '#f59e0b', '#10b981', '#8b5cf6', '#ec4899', '#0ea5e9']
-  ), []);
-  const colorFor = (name, i) => {
-    let h = 0;
-    for (let c = 0; c < name.length; c++) h = (h * 31 + name.charCodeAt(c)) | 0;
-    const idx = Math.abs(h + i) % palette.length;
-    return palette[idx];
-  };
+  // Distinct, high-contrast palette with no repeats among current names
+  const isLight = typeof document !== 'undefined' && document.documentElement.classList.contains('light');
+  const paletteSeed = useMemo(() => hashString(cleaned.join('|')), [cleaned]);
+  const palette = useMemo(() => buildDistinctPalette(cleaned.length, paletteSeed, isLight), [cleaned.length, paletteSeed, isLight]);
   
   const disabled = cleaned.length < 2 || spinning;
   
@@ -106,96 +105,90 @@ export default function RandomSpin() {
     }
   };
   
-  const wheelStyle = buildWheelStyle(cleaned, colorFor);
+  const wheelStyle = buildWheelStyleWithPalette(palette);
   const pointerLabel = spinning ? 'Spinning…' : (winner || 'Ready');
   
   return (
-    <div className="tool rs-wrap">
-      <div className="rs-panel">
-        <div className="rs-config">
-          <div className="rs-input modern">
-            <input
-              className="rs-input-field"
-              placeholder="Add names (comma separated)"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={onKeyDown}
-            />
-            <button 
-              className="rs-btn rs-btn-add" 
-              onClick={addNamesFromInput} 
-              disabled={!input.trim()}
-            >
-              Add
-            </button>
-            <button 
-              className="rs-btn rs-btn-clear" 
-              onClick={clearAll} 
-              disabled={names.length === 0}
-            >
-              Clear
-            </button>
-          </div>
-          
-          <div className="rs-tags">
-            {cleaned.map((n, i) => (
-              <span 
-                key={`${n}-${i}`} 
-                className={`rs-tag${winner === n ? ' hit' : ''}`}
-              >
-                {n}
-                <button 
-                  className="rs-tag-x" 
-                  onClick={() => removeName(i)} 
-                  aria-label={`remove ${n}`}
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-            {cleaned.length === 0 && (
-              <span className="rs-empty-message">No names yet. Add some to get started!</span>
-            )}
-          </div>
-          
-          <div className="rs-cta">
-            <button 
-              className="rs-btn rs-btn-spin" 
-              onClick={spin} 
-              disabled={disabled}
-            >
-              {spinning ? 'Spinning…' : 'Spin the Wheel'}
-            </button>
-          </div>
-        </div>
-        
-        <div className="rs-wheel-container">
-          <div 
-            className="rs-pointer" 
-            aria-label={pointerLabel}
-          />
-          <div 
-            className="rs-wheel" 
-            style={{ 
-              backgroundImage: wheelStyle, 
-              transform: `rotate(${angle}deg)` 
-            }}
-          >
-            {/* Clean wheel: no embedded labels, central cap only */}
+    <div className="tool randomspin">
+      <ToolHeader title="Random Spin" subtitle="Add names, spin the wheel, pick a winner" />
+
+  <div className="tool-content compact">
+        <div className="tool-section">
+          <div className="section-header">Add names</div>
+          <div className="section-body">
+            <div className="rs-input-row">
+              <input
+                className="input"
+                placeholder="Type names, press Enter, or paste comma/newline separated"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={onKeyDown}
+                aria-label="Name entry"
+              />
+              <button className="btn primary" onClick={addNamesFromInput} disabled={!input.trim()}>
+                Add
+              </button>
+              <button className="btn danger" onClick={clearAll} disabled={names.length === 0}>
+                Clear
+              </button>
+            </div>
+            <div className="rs-chips" aria-live="polite">
+              {cleaned.length === 0 ? (
+                <span className="muted">No names yet. Add some to get started.</span>
+              ) : (
+                cleaned.map((n, i) => (
+                  <span key={`${n}-${i}`} className={`chip${winner === n ? ' hit' : ''}`}>
+                    {n}
+                    <button className="chip-x" onClick={() => removeName(i)} aria-label={`Remove ${n}`}>
+                      ×
+                    </button>
+                  </span>
+                ))
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Legend showing slice colors and names */}
-        <div className="rs-legend">
-          {cleaned.length === 0 && (
-            <div className="rs-legend-empty muted">Add names to populate the legend.</div>
-          )}
+        <div className="tool-section">
+          <div className="section-header">Wheel</div>
+          <div className="section-body">
+            <div className="rs-grid">
+              <div className="rs-wheel-col">
+                <div className="rs-actions">
+                  <button className="btn primary large" onClick={spin} disabled={disabled}>
+                    {spinning ? 'Spinning…' : 'Spin'}
+                  </button>
+                  <div className="rs-winner" aria-live="polite">
+                    {winner ? (
+                      <span className={`badge ${pulse ? 'pulse' : ''}`}>Winner: {winner}</span>
+                    ) : (
+                      <span className="muted">{cleaned.length < 2 ? 'Add at least 2 names' : 'Ready'}</span>
+                    )}
+                  </div>
+                </div>
+                <div className="rs-wheel-container" role="img" aria-label="Selection wheel">
+                  <div className="rs-pointer" aria-label={pointerLabel} />
+                  <div
+                    className="rs-wheel"
+                    style={{ backgroundImage: wheelStyle, transform: `rotate(${angle}deg)` }}
+                  />
+                </div>
+              </div>
+              <div className="rs-legend-col">
+                <div className="rs-legend">
+                  {cleaned.length === 0 && (
+                    <div className="muted">Legend will appear once you add names.</div>
+                  )}
           {cleaned.map((n, i) => (
-            <div key={`${n}-${i}`} className={`rs-legend-item${winner === n ? ' hit' : ''}`}>
-              <span className="rs-swatch" style={{ backgroundColor: colorFor(n, i) }} />
-              <span className="rs-name">{n}</span>
+                    <div key={`${n}-${i}`} className={`rs-legend-item${winner === n ? ' hit' : ''}`}>
+            <span className="rs-swatch" style={{ background: palette[i] }} />
+                      <span className="rs-name">{n}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </div>
@@ -206,16 +199,46 @@ function easeOutCubic(t) {
   return 1 - Math.pow(1 - t, 3); 
 }
 
-function buildWheelStyle(names, colorFor) {
-  if (names.length === 0) return 'conic-gradient(var(--border), var(--border))';
-
-  const step = 100 / names.length;
-  const stops = names.map((_, i) => {
-  const c = colorFor(names[i], i);
+function buildWheelStyleWithPalette(colors) {
+  if (colors.length === 0) return 'conic-gradient(var(--border), var(--border))';
+  const step = 100 / colors.length;
+  const stops = colors.map((c, i) => {
     const from = (i * step).toFixed(4);
     const to = ((i + 1) * step).toFixed(4);
     return `${c} ${from}% ${to}%`;
   });
-  
   return `conic-gradient(${stops.join(',')})`;
+}
+
+function buildDistinctPalette(count, seed = 0, lightTheme = false) {
+  const colors = [];
+  if (count <= 0) return colors;
+  const baseHue = ((seed % 360) + 360) % 360;
+  const saturation = 70; // modern, not neon
+  const lightness = lightTheme ? 58 : 64; // lighter for dark theme
+  for (let i = 0; i < count; i++) {
+    const hue = (baseHue + (i * 360 / count)) % 360;
+    colors.push(`hsl(${hue} ${saturation}% ${lightness}%)`);
+  }
+  // small dither for very large sets to avoid neighbors being too similar
+  if (count > 10) {
+    for (let i = 0; i < count; i++) {
+      const jitter = (i % 2 === 0) ? (lightTheme ? -2 : 2) : 0;
+      const [h, s, l] = parseHsl(colors[i]);
+      colors[i] = `hsl(${h} ${s}% ${Math.max(40, Math.min(72, l + jitter))}%)`;
+    }
+  }
+  return colors;
+}
+
+function parseHsl(str) {
+  const m = str.match(/hsl\((\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%\)/);
+  if (!m) return [0, 0, 0];
+  return [parseFloat(m[1]), parseFloat(m[2]), parseFloat(m[3])];
+}
+
+function hashString(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
 }
