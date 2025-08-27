@@ -1,5 +1,5 @@
-import React, { Suspense, useMemo, useRef } from 'react';
-import { CSSTransition, SwitchTransition } from 'react-transition-group';
+import React, { Suspense, useMemo } from 'react';
+import { AnimatePresence, motion as FM } from 'framer-motion';
 import ToolRegistry from '../core/ToolRegistry';
 import LoadingSpinner from './LoadingSpinner';
 
@@ -24,26 +24,28 @@ export default function ToolContainer({ toolId }) {
   const importer = ToolRegistry.getImporter(toolId);
 
   const ToolLazy = useMemo(() => importer ? React.lazy(importer) : null, [importer]);
-  // Use nodeRef to avoid findDOMNode warning in StrictMode
-  const nodeRef = useRef(null);
 
   return (
     <div className="tool-stage">
-      <SwitchTransition mode="out-in">
-        <CSSTransition key={toolId || 'empty'} timeout={180} classNames="fade" nodeRef={nodeRef}>
-          <div ref={nodeRef}>
-            {!ToolLazy ? (
-              <div style={{ padding: 24 }} className="muted">Select a tool to get started.</div>
-            ) : (
-              <Suspense fallback={<LoadingSpinner />}>
-                <ToolErrorBoundary>
-                  <ToolLazy />
-                </ToolErrorBoundary>
-              </Suspense>
-            )}
-          </div>
-        </CSSTransition>
-      </SwitchTransition>
+      <AnimatePresence mode="wait">
+        <FM.div
+          key={toolId || 'empty'}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.18, ease: 'easeOut' }}
+        >
+          {!ToolLazy ? (
+            <div style={{ padding: 24 }} className="muted">Select a tool to get started.</div>
+          ) : (
+            <Suspense fallback={<LoadingSpinner />}>
+              <ToolErrorBoundary>
+                <ToolLazy />
+              </ToolErrorBoundary>
+            </Suspense>
+          )}
+  </FM.div>
+      </AnimatePresence>
     </div>
   );
 }

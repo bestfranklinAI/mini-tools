@@ -78,5 +78,5 @@ function ToolIcon({ dir, iconPath, size }) {
   const modules = import.meta.glob('../tools/*/assets/*.svg', { eager: true, query: '?url', import: 'default' });
   const url = modules[rel];
   if (!url) return <div style={{ width: size, height: size, background: 'var(--border)', borderRadius: 8 }} />;
-  return <img src={url} alt="" width={size} height={size} style={{ objectFit: 'contain', filter: 'drop-shadow(0 2px 6px var(--shadow))' }} />;
+  return <img className="dock-icon" src={url} alt="" width={size} height={size} style={{ objectFit: 'contain', filter: 'drop-shadow(0 2px 6px var(--shadow))' }} />;
 }

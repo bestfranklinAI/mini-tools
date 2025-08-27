@@ -1,10 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { motion as FM, AnimatePresence } from 'framer-motion';
+import { Search as SearchIcon, Command } from 'lucide-react';
 import SearchEngine from '../core/SearchEngine';
+import ToolRegistry from '../core/ToolRegistry';
 
 export default function SearchBar({ onPick }) {
   const [q, setQ] = useState('');
   const [results, setResults] = useState(() => SearchEngine.query(''));
   const [open, setOpen] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(-1);
   const inputRef = useRef(null);
 
   const debounced = useMemo(() => {
@@ -17,34 +21,87 @@ export default function SearchBar({ onPick }) {
     };
   }, []);
 
+  useEffect(() => { debounced(q); }, [q, debounced]);
+
+  // keyboard handling (arrows / enter / esc). Also add global Cmd+K to focus.
   useEffect(() => {
-    debounced(q);
-  }, [q, debounced]);
+    const onKey = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        inputRef.current?.focus();
+        setOpen(true);
+        return;
+      }
+      if (!open) return;
+      if (e.key === 'Escape') { setOpen(false); setActiveIdx(-1); return; }
+      if (e.key === 'ArrowDown') { e.preventDefault(); setActiveIdx((i) => Math.min(i + 1, results.length - 1)); }
+      if (e.key === 'ArrowUp') { e.preventDefault(); setActiveIdx((i) => Math.max(i - 1, 0)); }
+      if (e.key === 'Enter') {
+        const pick = results[activeIdx] || results[0];
+        if (pick) { onPick(pick.id); setOpen(false); inputRef.current?.blur(); }
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, results, activeIdx, onPick]);
 
   return (
     <div style={{ position: 'relative', flex: 1 }}>
-      <input
+      <div className="search-wrap">
+        <SearchIcon size={16} className="search-lead" aria-hidden="true" />
+        <input
         ref={inputRef}
         value={q}
-        onChange={(e) => setQ(e.target.value)}
+        onChange={(e) => { setQ(e.target.value); setActiveIdx(-1); }}
         onFocus={() => setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 120)}
         placeholder="Search tools…"
-  className="search-input"
+        className="search-input"
+        aria-autocomplete="list"
+        aria-expanded={open}
       />
-      {open && results.length > 0 && (
-        <div style={{ position: 'absolute', top: 'calc(100% + 8px)', left: 0, right: 0, background: 'var(--bg-elev)', border: '1px solid var(--border)', borderRadius: 12, boxShadow: '0 10px 30px var(--shadow)', maxHeight: 320, overflow: 'auto', zIndex: 20 }}>
-          {results.slice(0, 12).map((r) => (
-            <button key={r.id} className="search-item" onMouseDown={() => onPick(r.id)} style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', textAlign: 'left', padding: 10, background: 'transparent', border: 0, color: 'var(--text)', cursor: 'pointer' }}>
-              <span style={{ width: 8, height: 8, background: 'var(--accent)', borderRadius: '50%' }} />
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span>{r.name}</span>
-                <span className="muted" style={{ fontSize: 12 }}>{r.description}</span>
-              </div>
-            </button>
-          ))}
-        </div>
-      )}
+        <kbd className="search-kbd"><Command size={12} />K</kbd>
+      </div>
+    <AnimatePresence>
+        {open && results.length > 0 && (
+      <FM.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 6 }}
+            transition={{ duration: 0.16, ease: 'easeOut' }}
+            className="search-pop"
+            role="listbox"
+          >
+            {results.slice(0, 12).map((r, idx) => (
+              <button
+                key={r.id}
+                className={`search-item${idx === activeIdx ? ' active' : ''}`}
+                onMouseDown={() => onPick(r.id)}
+                onMouseEnter={() => setActiveIdx(idx)}
+                role="option"
+                aria-selected={idx === activeIdx}
+              >
+                <ToolIcon toolId={r.id} size={22} />
+                <div className="search-meta">
+                  <span>{r.name}</span>
+                  <span className="muted desc">{r.description}</span>
+                </div>
+              </button>
+            ))}
+          </FM.div>
+        )}
+      </AnimatePresence>
     </div>
   );
+}
+
+function ToolIcon({ toolId, size }) {
+  const meta = ToolRegistry.getMeta(toolId);
+  if (!meta) return <span style={{ width: size, height: size }} />;
+  // Reuse the same glob as MacDock
+  const rel = `${meta.dir}/${meta.icon}`.replace(/^\.\//, '');
+  const modules = import.meta.glob('../tools/*/assets/*.svg', { eager: true, query: '?url', import: 'default' });
+  const url = modules[rel];
+  if (!url) return <span style={{ width: size, height: size }} />;
+  return <img src={url} alt="" width={size} height={size} style={{ objectFit: 'contain', filter: 'drop-shadow(0 1px 3px var(--shadow))' }} />;
 }

@@ -1,0 +1,9 @@
+{
+  "id": "pomodoro",
+  "name": "Pomodoro",
+  "description": "Focus sessions with breaks, auto-cycles, and stats.",
+  "tags": ["focus", "productivity", "time"],
+  "keywords": ["study", "work", "pomodoro", "tomato"],
+  "icon": "assets/pomodoro.svg",
+  "entry": "Pomodoro.jsx"
+}

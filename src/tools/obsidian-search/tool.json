@@ -1,0 +1,9 @@
+{
+  "id": "obsidian-search",
+  "name": "Omni Search (Obsidian)",
+  "description": "Search your Obsidian vaults via a local server and open notes directly.",
+  "tags": ["search", "notes", "obsidian"],
+  "keywords": ["obsidian", "vault", "notes", "search"],
+  "icon": "assets/icon.svg",
+  "entry": "ObsidianSearch.jsx"
+}

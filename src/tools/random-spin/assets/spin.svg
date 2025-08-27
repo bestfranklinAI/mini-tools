@@ -1,21 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#7aa2f7"/>
-      <stop offset="100%" stop-color="#7dcfff"/>
-    </linearGradient>
-  </defs>
-  <circle cx="128" cy="128" r="110" fill="#0b0e14" stroke="#4b84ff" stroke-width="10"/>
-  <g transform="translate(128 128)">
-    <g>
-      <path d="M0-96 A96 96 0 0 1 83.14-48 L0 0 Z" fill="url(#g)"/>
-      <path d="M83.14-48 A96 96 0 0 1 83.14 48 L0 0 Z" fill="#3ccf91"/>
-      <path d="M83.14 48 A96 96 0 0 1 0 96 L0 0 Z" fill="#ffd166"/>
-      <path d="M0 96 A96 96 0 0 1 -83.14 48 L0 0 Z" fill="#ef476f"/>
-      <path d="M-83.14 48 A96 96 0 0 1 -83.14 -48 L0 0 Z" fill="#a78bfa"/>
-      <path d="M-83.14 -48 A96 96 0 0 1 0 -96 L0 0 Z" fill="#06b6d4"/>
-    </g>
-  </g>
-  <circle cx="128" cy="128" r="12" fill="#fff"/>
-  <polygon points="128,14 120,44 136,44" fill="#fff"/>
+<?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg version="1.1" id="Uploaded to svgrepo.com" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 width="800px" height="800px" viewBox="0 0 32 32" xml:space="preserve">
+<style type="text/css">
+	.blueprint_een{fill:#111918;}
+</style>
+<path class="blueprint_een" d="M16,2C8.268,2,2,8.268,2,16s6.268,14,14,14s14-6.268,14-14S23.732,2,16,2z M16,28
+	C9.383,28,4,22.617,4,16S9.383,4,16,4s12,5.383,12,12S22.617,28,16,28z M16,5C9.925,5,5,9.925,5,16s4.925,11,11,11s11-4.925,11-11
+	S22.075,5,16,5z M16,6c2.577,0,4.922,0.989,6.697,2.596l-5.541,5.541l-1.032-0.129C16.083,14.003,16.042,14,16,14
+	c-0.37,0-0.712,0.108-1.01,0.283L9.303,8.596C11.078,6.989,13.423,6,16,6z M16,17c-0.552,0-1-0.448-1-1c0-0.552,0.448-1,1-1l8,1
+	L16,17z M6,16c0-2.577,0.989-4.922,2.596-6.697l5.688,5.688C14.108,15.288,14,15.63,14,16c0,0.37,0.108,0.712,0.283,1.01
+	l-5.688,5.688C6.988,20.922,6,18.577,6,16z M16,26c-2.577,0-4.922-0.989-6.697-2.596l5.688-5.688C15.288,17.892,15.63,18,16,18
+	c0.042,0,0.083-0.003,0.124-0.008l1.032-0.129l5.541,5.541C20.922,25.011,18.577,26,16,26z M23.404,22.697l-4.991-4.991l5.711-0.714
+	C24.624,16.93,25,16.504,25,16s-0.376-0.93-0.876-0.992l-5.711-0.714l4.991-4.991C25.011,11.078,26,13.423,26,16
+	C26,18.577,25.012,20.922,23.404,22.697z"/>
 </svg>

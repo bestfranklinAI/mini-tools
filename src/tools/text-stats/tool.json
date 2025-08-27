@@ -1,0 +1,9 @@
+{
+  "id": "text-stats",
+  "name": "Word & Token Counter",
+  "description": "Count words, characters, lines, paragraphs, sentences, bytes, and approximate tokens.",
+  "tags": ["text", "utility"],
+  "keywords": ["word count", "character count", "token", "bytes", "sentences"],
+  "icon": "assets/count.svg",
+  "entry": "TextStats.jsx"
+}

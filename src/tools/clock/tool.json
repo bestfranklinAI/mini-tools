@@ -1,0 +1,9 @@
+{
+  "id": "clock",
+  "name": "Clock",
+  "description": "Modern animated clock with a large time display, date, and interactive settings.",
+  "tags": ["utility", "time"],
+  "keywords": ["clock", "time", "date", "24h", "12h"],
+  "icon": "assets/clock.svg",
+  "entry": "Clock.jsx"
+}

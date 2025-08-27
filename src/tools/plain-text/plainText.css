@@ -1,0 +1,29 @@
+.tool.pt { padding: 16px; }
+.pt__controls { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+.pt__controls .btn {
+  background: var(--bg-elev); color: var(--text); border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, color 160ms ease, transform 60ms ease;
+}
+.pt__controls .btn:hover { border-color: var(--accent); }
+.pt__controls .btn:active { transform: translateY(1px); }
+.pt__controls .btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.pt__toggle { display: flex; gap: 8px; align-items: center; color: var(--muted); }
+.spacer { flex: 1; }
+
+.pt__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pt__input, .pt__output {
+  min-height: 260px; background: var(--bg-elev); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 12px; font: inherit;
+  resize: vertical; outline: none; white-space: pre-wrap; word-break: break-word;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
+}
+.pt__input::placeholder { color: var(--muted); }
+.pt__input:focus, .pt__output:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 30%, transparent);
+}
+
+.pt__meta { margin-top: 8px; color: var(--muted); display: flex; gap: 8px; align-items: center; }
+
+@media (max-width: 900px) {
+  .pt__grid { grid-template-columns: 1fr; }
+}

@@ -42,6 +42,14 @@ No core code changes needed — the app discovers the tool automatically.
 ## Notes
 
 - Fuzzy search via `fuzzy-search`
-- Transitions via `react-transition-group`
-- Dark mode toggle uses CSS custom properties
+- Animations via `framer-motion` (tool transitions, modal, search dropdown)
+- Dark/light theme toggle using CSS custom properties
 - Error boundary and loading states included in `ToolContainer`
+
+### Shortcuts
+
+- Cmd/Ctrl+K — Focus search
+- Arrow Up/Down — Navigate search results
+- Enter — Open selected tool
+- Esc — Close search / modal
+- Cmd/Ctrl+Enter (in Settings) — Save

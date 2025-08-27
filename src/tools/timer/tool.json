@@ -1,0 +1,9 @@
+{
+  "id": "timer",
+  "name": "Timer",
+  "description": "Count up or down with presets, alerts, and a clean display.",
+  "tags": ["time", "utility"],
+  "keywords": ["countdown", "countup", "stopwatch"],
+  "icon": "assets/timer.svg",
+  "entry": "Timer.jsx"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "plain-text",
+  "name": "Plain Text Formatter",
+  "description": "Strip all rich text styling and copy clean plain text.",
+  "tags": ["text", "format", "clean"],
+  "keywords": ["plain", "paste", "copy", "sanitize", "whitespace"],
+  "icon": "assets/plain.svg",
+  "entry": "PlainText.jsx"
+}
