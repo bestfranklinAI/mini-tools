@@ -1,0 +1,9 @@
+{
+  "id": "image-editor",
+  "name": "Image Editor",
+  "description": "Edit images, remove backgrounds, and export results.",
+  "tags": ["image", "editor", "background", "canvas"],
+  "keywords": ["photo", "konva", "remove background", "png", "jpg"],
+  "icon": "assets/icon.svg",
+  "entry": "ImageEditor.jsx"
+}
