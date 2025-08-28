@@ -30,3 +30,40 @@
 @media (max-width: 900px) {
   .mknp-split { grid-template-columns: 1fr; grid-template-rows: 220px 1fr; }
 }
+
+.mknp-generator-section {
+  border-top: 1px solid var(--border);
+}
+
+.mknp-generator-section .section-header {
+  padding: 10px 12px;
+  font-weight: 600;
+}
+
+.mknp-generator-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mknp-generator-textarea {
+  width: 100%;
+  min-height: 70px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 8px 10px;
+  outline: none;
+  resize: vertical;
+  font: 14px/1.5 var(--font-sans);
+}
+
+.mknp-generator-textarea::placeholder {
+  color: var(--muted);
+}
+
+.mknp-generator-btn {
+  align-self: flex-end;
+}

@@ -4,6 +4,7 @@ import ToolHeader from '../../components/ToolHeader';
 import UI from '../../core/UI';
 import MarkdownIt from 'markdown-it';
 import markdownItTaskLists from 'markdown-it-task-lists';
+import { simplePrompt } from '../../core/LLMClient';
 
 // Storage keys
 const LS_KEY = 'mknp:notes';
@@ -69,6 +70,9 @@ export default function MarkdownNotepad() {
   const [notes, setNotes] = useState(loadNotes);
   const [selectedId, setSelectedId] = useState(() => notes[0]?.id);
   const [editMode, setEditMode] = useState(false);
+  const [projectDescription, setProjectDescription] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+
 
   // Markdown-it with task list plugin (clickable in read mode)
   const md = useMemo(() => {
@@ -144,7 +148,7 @@ export default function MarkdownNotepad() {
         const body = m[2].trim();
         if (body === labelText) {
           const checked = m[1].toLowerCase() === 'x';
-          const next = `${line.replace(/\[( |x|X)\]/, checked ? '[ ]' : '[x]')}`;
+          const next = `${line.replace(/\b\[( |x|X)\]\b/, checked ? '[ ]' : '[x]')}`;
           const newLines = [...lines];
           newLines[i] = next;
           const nextContent = newLines.join('\n');
@@ -152,6 +156,48 @@ export default function MarkdownNotepad() {
           break;
         }
       }
+    }
+  };
+
+  const handleGenerateTasks = async () => {
+    if (!projectDescription.trim()) {
+      UI.toast('Please enter a project description.', { type: 'warn' });
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const prompt = `Based on the following project description, generate a detailed task breakdown as a markdown checklist.
+
+Project Description:
+"${projectDescription}"
+
+The output should be only the markdown checklist, with no other text before or after.`
+
+      const { text } = await simplePrompt(prompt, { system: 'You are a project management assistant. Your goal is to create actionable task lists in markdown format.' });
+
+      if (text) {
+        const newNote = {
+          id: uid(),
+          title: `Tasks for "${projectDescription.substring(0, 20)}..."`,
+          content: text,
+          createdAt: nowTs(),
+          updatedAt: nowTs(),
+        };
+        const updated = [newNote, ...notes].slice(0, MAX_NOTES);
+        setNotes(updated);
+        setSelectedId(newNote.id);
+        setEditMode(false); // Switch to read mode to see the checklist
+        setProjectDescription(''); // Clear the input
+        UI.toast('Task list generated!', { type: 'success' });
+      } else {
+        throw new Error('LLM returned an empty response.');
+      }
+    } catch (error) {
+      console.error('Failed to generate tasks:', error);
+      UI.toast(error.message || 'Failed to generate tasks from LLM.', { type: 'error' });
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -220,6 +266,25 @@ export default function MarkdownNotepad() {
                     <article dangerouslySetInnerHTML={{ __html: rendered }} />
                   </div>
                 )}
+              </div>
+              <div className="mknp-generator-section">
+                <div className="section-header">✨ AI Task Generator</div>
+                <div className="mknp-generator-body">
+                  <textarea
+                    className="mknp-generator-textarea"
+                    value={projectDescription}
+                    onChange={(e) => setProjectDescription(e.target.value)}
+                    placeholder="Describe your project or goal, and I'll generate a task list for you..."
+                    disabled={isGenerating}
+                  />
+                  <button
+                    className="btn primary mknp-generator-btn"
+                    onClick={handleGenerateTasks}
+                    disabled={isGenerating || !projectDescription.trim()}
+                  >
+                    {isGenerating ? 'Generating...' : 'Generate Tasks'}
+                  </button>
+                </div>
               </div>
             </div>
           ) : (

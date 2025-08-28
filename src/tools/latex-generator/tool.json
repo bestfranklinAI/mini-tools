@@ -1,0 +1,9 @@
+{
+  "id": "latex-generator",
+  "name": "LaTeX Math Generator",
+  "description": "Generate LaTeX math expressions from a visual symbol selector.",
+  "tags": ["math", "latex", "tex", "generator", "equation"],
+  "keywords": ["mathjax", "katex", "symbols", "greek"],
+  "icon": "assets/icon.svg",
+  "entry": "LatexGenerator.jsx"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "base64-converter",
+  "name": "Base64 Converter",
+  "description": "Convert images to Base64 strings and vice versa.",
+  "tags": ["utility", "developer", "image", "encoding"],
+  "keywords": ["base64", "image", "converter", "encoder", "decoder"],
+  "icon": "assets/icon.svg",
+  "entry": "Base64Converter.jsx"
+}
