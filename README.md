@@ -1,6 +1,7 @@
 # Modular Tools SPA (Vite + React)
 
 Single-page, plugin-based multi-tool app. Tools are discovered from `src/tools/**/tool.json` via `import.meta.glob`, lazily loaded, and shown one-at-a-time with transitions. Includes fuzzy search and a Mac-style dock.
+Demo Site: [https://franklin.is-a.dev/mini-tools/](https://franklin.is-a.dev/mini-tools/)
 
 ## Run
 
