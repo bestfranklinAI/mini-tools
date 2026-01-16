@@ -32,6 +32,7 @@ function buildRegistry() {
   Object.entries(toolJsonModules).forEach(([path, mod]) => {
     // Vite JSON modules default export is parsed JSON
     const meta = mod?.default ?? mod;
+    if (path.includes('/_template/')) return;
     if (!validateToolMeta(meta, path)) return;
 
     if (ids.has(meta.id)) {

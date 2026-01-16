@@ -1,5 +1,4 @@
-import './markdownNotepad.css';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ToolHeader from '../../components/ToolHeader';
 import UI from '../../core/UI';
 import MarkdownIt from 'markdown-it';
@@ -218,77 +217,103 @@ The output should be only the markdown checklist, with no other text before or a
   }, [notes]);
 
   return (
-    <div className="tool mknp-wrap">
+    <div className="tool-root mknp-wrap">
       <ToolHeader title="Markdown Notepad" subtitle="Quick notes with markdown + checklists" />
 
-      <div className="mknp-topbar">
-        <div className="mknp-actions">
-          <button className="mknp-btn" onClick={addNote}>New</button>
+      <div className="flex justify-between items-center p-3 border-b">
+        <div className="flex gap-2">
+          <button className="btn small primary" onClick={addNote}>New Note</button>
           {current && (
-            <button className="mknp-btn mknp-danger" onClick={() => deleteNote(current.id)}>Delete</button>
+            <button className="btn small danger" onClick={() => deleteNote(current.id)}>Delete</button>
           )}
         </div>
-        <div className="mknp-actions">
-          <label className="mknp-toggle">
-            <input type="checkbox" checked={editMode} onChange={() => setEditMode((v) => !v)} />
-            <span>{editMode ? 'Edit' : 'Read'}</span>
-          </label>
+        <div className="flex gap-2">
+           <div className="segmented">
+            <button className={`segmented-item ${!editMode ? 'active' : ''}`} onClick={() => setEditMode(false)}>Read</button>
+            <button className={`segmented-item ${editMode ? 'active' : ''}`} onClick={() => setEditMode(true)}>Edit</button>
+           </div>
         </div>
       </div>
 
-      <div className="mknp-split">
-        <div className="mknp-pane">
-          <div className="mknp-notes">
-            <div className="mknp-notes-header">Notes</div>
-            <div className="mknp-list">
-              {notes.length === 0 && <div className="mknp-empty">No notes yet</div>}
-              {notes.map((n) => (
-                <div key={n.id} className={`mknp-item${n.id === current?.id ? ' active' : ''}`} onClick={() => selectNote(n.id)}>
-                  <div className="mknp-item-title">{n.title || 'Untitled note'}</div>
-                  <div className="mknp-item-time" title={fmtDate(n.updatedAt)}> {new Date(n.updatedAt).toLocaleDateString()} </div>
-                </div>
-              ))}
+      <div className="tool-split">
+        {/* Sidebar: Notes List */}
+        <div className="tool-pane" style={{ flex: '0 0 300px' }}>
+          <div className="tool-pane-header">All Notes</div>
+          <div className="tool-pane-content p-0">
+            {notes.length === 0 && <div className="p-4 text-muted text-center">No notes yet</div>}
+            <div className="flex flex-col">
+            {notes.map((n) => (
+              <div 
+                key={n.id} 
+                className={`p-3 border-b cursor-pointer transition-colors`}
+                style={{
+                  borderLeft: n.id === current?.id ? '4px solid var(--accent)' : '4px solid transparent',
+                  background: n.id === current?.id ? 'color-mix(in oklab, var(--accent) 12%, transparent)' : 'transparent'
+                }}
+                onClick={() => selectNote(n.id)}
+              >
+                <div className="font-medium truncate">{n.title || 'Untitled note'}</div>
+                <div className="text-small text-muted" title={fmtDate(n.updatedAt)}> {new Date(n.updatedAt).toLocaleDateString()} </div>
+              </div>
+            ))}
             </div>
           </div>
         </div>
 
-        <div className="mknp-pane">
+        {/* Main: Editor/Preview */}
+        <div className="tool-pane flex-1">
           {current ? (
-            <div className="mknp-editor-wrap">
-              <div className="mknp-note-header">
-                <input className="mknp-title-input" placeholder="Title" value={title} onChange={(e) => saveTitle(e.target.value)} />
+            <>
+              <div className="tool-pane-header p-2">
+                <input 
+                  className="input border-0 w-full" 
+                  style={{ background: 'transparent', fontWeight: 600, fontSize: '1.1em', boxShadow: 'none' }}
+                  placeholder="Note Title" 
+                  value={title} 
+                  onChange={(e) => saveTitle(e.target.value)} 
+                />
               </div>
-              <div className="mknp-editor-body">
+              <div className="tool-pane-content p-0 flex flex-col h-full">
                 {editMode ? (
-                  <textarea className="mknp-textarea" value={content} onChange={(e) => saveContent(e.target.value)} spellCheck="false" placeholder="Write Markdown here…" />
+                  <textarea 
+                    className="textarea flex-1 border-0 h-full w-full" 
+                    style={{ resize: 'none', borderRadius: 0, boxShadow: 'none', padding: '16px' }}
+                    value={content} 
+                    onChange={(e) => saveContent(e.target.value)} 
+                    spellCheck="false" 
+                    placeholder="Write Markdown here…" 
+                  />
                 ) : (
-                  <div className="mknp-preview mknp-markdown" onClick={onPreviewClick}>
+                  <div className="mknp-preview mknp-markdown flex-1 overflow-auto p-4" onClick={onPreviewClick}>
                     <article dangerouslySetInnerHTML={{ __html: rendered }} />
                   </div>
                 )}
-              </div>
-              <div className="mknp-generator-section">
-                <div className="section-header">✨ AI Task Generator</div>
-                <div className="mknp-generator-body">
-                  <textarea
-                    className="mknp-generator-textarea"
-                    value={projectDescription}
-                    onChange={(e) => setProjectDescription(e.target.value)}
-                    placeholder="Describe your project or goal, and I'll generate a task list for you..."
-                    disabled={isGenerating}
-                  />
-                  <button
-                    className="btn primary mknp-generator-btn"
-                    onClick={handleGenerateTasks}
-                    disabled={isGenerating || !projectDescription.trim()}
-                  >
-                    {isGenerating ? 'Generating...' : 'Generate Tasks'}
-                  </button>
+                
+                {/* AI Generator at bottom of editor pane */}
+                <div className="border-t p-3">
+                   <div className="flex gap-2 items-start">
+                      <textarea
+                        className="input text-small flex-1"
+                        style={{ minHeight: 40, resize: 'none' }}
+                        rows={1}
+                        value={projectDescription}
+                        onChange={(e) => setProjectDescription(e.target.value)}
+                        placeholder="✨ AI: Describe a project to generate a task list..."
+                        disabled={isGenerating}
+                      />
+                      <button
+                        className="btn small primary"
+                        onClick={handleGenerateTasks}
+                        disabled={isGenerating || !projectDescription.trim()}
+                      >
+                        {isGenerating ? '...' : 'Generate'}
+                      </button>
+                   </div>
                 </div>
               </div>
-            </div>
+            </>
           ) : (
-            <div className="mknp-empty">Select or create a note</div>
+            <div className="flex center h-full text-muted">Select or create a note</div>
           )}
         </div>
       </div>

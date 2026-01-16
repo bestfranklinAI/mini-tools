@@ -1,0 +1,13 @@
+.home-grid {
+  height: 100%;
+  overflow-y: auto;
+  padding: var(--space-5);
+  /* Ensure scrolling is smooth */
+  overscroll-behavior: contain;
+}
+
+/* Ensure the sections don't cause horizontal overflow */
+.home-grid section {
+  margin-bottom: var(--space-5);
+  max-width: 100%;
+}

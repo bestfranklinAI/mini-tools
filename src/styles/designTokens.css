@@ -15,7 +15,8 @@
   --radius: 12px;
   --radius-sm: 8px;
   --radius-lg: 16px;
-  --dock-height: 92px;
+  /* Dock height includes safe area for mobile home indicator */
+  --dock-height: calc(96px + env(safe-area-inset-bottom, 0px));
   --tool-max-height: calc(100vh - var(--dock-height) - 120px);
   --tool-min-height: 420px;
   

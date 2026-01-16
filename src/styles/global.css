@@ -2,7 +2,7 @@
 @import './components.css';
 
 * { box-sizing: border-box; }
-html, body, #root { height: 100%; }
+html, body, #root { height: 100%; height: 100dvh; }
 body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background: var(--bg); color: var(--text); transition: background-color 180ms ease, color 180ms ease; }
 
 /* Derive topbar height for layout calcs if needed */
@@ -12,6 +12,8 @@ body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI
   display: grid;
   grid-template-rows: auto 1fr auto;
   height: 100%;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 .topbar {
@@ -41,11 +43,12 @@ body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI
 .search-meta .desc { font-size: 12px; }
 
 .content {
-  /* Fill the grid's 1fr row and keep content clear of the fixed dock */
+  /* Fill the grid's 1fr row */
   padding: 16px;
-  padding-bottom: calc(16px + var(--dock-height));
+  /* Ensure we have enough space at the bottom so content can scroll fully into view above the dock */
+  padding-bottom: calc(20px + var(--dock-height));
   height: 100%;
-  min-height: 0; /* allow children to size properly */
+  min-height: 0;
   overflow: auto;
 }
 
@@ -65,7 +68,7 @@ body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI
   flex-direction: column;
 }
 
-.dock-wrap { position: fixed; left: 0; right: 0; bottom: 0; padding: 14px 0 22px; backdrop-filter: saturate(120%) blur(10px); background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.28)); pointer-events: none; }
+.dock-wrap { position: fixed; left: 0; right: 0; bottom: 0; padding: 14px 0 calc(22px + env(safe-area-inset-bottom, 0px)); backdrop-filter: saturate(120%) blur(10px); background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.28)); pointer-events: none; }
 .dock { pointer-events: auto; display: flex; gap: 12px; justify-content: center; align-items: flex-end; }
 .dock-item { border-radius: 14px; border: 1px solid var(--border); background: var(--bg-elev); padding: 8px; cursor: pointer; display: grid; place-items: center; box-shadow: 0 4px 16px var(--shadow); transition: transform 120ms ease, box-shadow 160ms ease, border-color 160ms ease, background-color 160ms ease; position: relative; will-change: transform; transform-origin: bottom center; }
 .dock-item { animation: dock-in 220ms ease-out; }

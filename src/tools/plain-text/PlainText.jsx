@@ -1,4 +1,3 @@
-import './plainText.css';
 import { useMemo, useState } from 'react';
 import UI from '../../core/UI';
 import ToolHeader from '../../components/ToolHeader';
@@ -25,9 +24,9 @@ function stripMarkdown(t) {
   // Inline code
   s = s.replace(/`([^`]+)`/g, '$1');
   // Images: keep alt text
-  s = s.replace(/!\[([^\]]*)\]\([^\)]*\)/g, '$1');
+  s = s.replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1');
   // Links: keep link text
-  s = s.replace(/\[([^\]]+)\]\(([^\)]*)\)/g, '$1');
+  s = s.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1');
   // Reference-style links: [text][ref]
   s = s.replace(/\[([^\]]+)\]\s*\[[^\]]*\]/g, '$1');
   // Headings: leading/trailing hashes
@@ -77,6 +76,7 @@ function sanitizePlainText(raw, { collapseWhitespace, stripMd }) {
     .replace(/[\u2018\u2019\u201B\u2032]/g, "'")
     .replace(/[\u201C\u201D\u201F\u2033]/g, '"');
   // Remove other control chars except tab/newline
+  // eslint-disable-next-line no-control-regex
   t = t.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
   // Decode entities, strip HTML, then Markdown if opted
   t = decodeEntities(t);
@@ -136,56 +136,77 @@ export default function PlainText() {
       setTimeout(() => {
         try {
           target.selectionStart = target.selectionEnd = start + text.length;
-        } catch {}
+        } catch { /* ignore */ }
       }, 0);
     }
   };
 
   return (
-    <div className="tool pt">
+    <div className="tool-root pt">
       <ToolHeader title="Plain Text Cleaner" subtitle="Strip markup and sanitize text" />
-      <div className="pt__controls">
-        <button className="btn" type="button" onClick={pasteIn} title="Paste from clipboard">
+      
+      <div className="flex gap-4 p-4 items-center wrap border-b">
+        <button className="btn small" type="button" onClick={pasteIn} title="Paste from clipboard">
           Paste
         </button>
-        <button className="btn" type="button" onClick={() => setInput('')} title="Clear input">
+        <button className="btn small" type="button" onClick={() => setInput('')} title="Clear input">
           Clear
         </button>
-        <label className="pt__toggle">
-          <input
-            type="checkbox"
-            checked={collapseWhitespace}
-            onChange={(e) => setCollapseWhitespace(e.target.checked)}
-          />
-          Collapse whitespace
-        </label>
-        <label className="pt__toggle">
-          <input
-            type="checkbox"
-            checked={stripMd}
-            onChange={(e) => setStripMd(e.target.checked)}
-          />
-          Strip Markdown
-        </label>
-        <div className="spacer" />
-        <button className="btn primary" type="button" onClick={copyOut} title="Copy cleaned text">
-          Copy Clean
-        </button>
+        <div className="flex gap-4 ml-auto">
+          <label className="switch small">
+            <input
+              type="checkbox"
+              checked={collapseWhitespace}
+              onChange={(e) => setCollapseWhitespace(e.target.checked)}
+            />
+            <span>Collapse whitespace</span>
+          </label>
+          <label className="switch small">
+            <input
+              type="checkbox"
+              checked={stripMd}
+              onChange={(e) => setStripMd(e.target.checked)}
+            />
+            <span>Strip Markdown</span>
+          </label>
+        </div>
       </div>
-      <div className="pt__grid">
-        <textarea
-          className="pt__input"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onPaste={onPaste}
-          placeholder="Paste rich text here. Formatting will be stripped."
-        />
-        <textarea className="pt__output" value={output} readOnly />
-      </div>
-      <div className="pt__meta">
-        <span>{output.length.toLocaleString()} chars</span>
-        <span>•</span>
-        <span>{output.split('\n').length.toLocaleString()} lines</span>
+
+      <div className="tool-split">
+        <div className="tool-pane">
+          <div className="tool-pane-header">Input (Rich Text)</div>
+          <div className="tool-pane-content p-0">
+            <textarea
+              className="textarea h-full border-0"
+              style={{ borderRadius: 0 }}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onPaste={onPaste}
+              placeholder="Paste rich text here. Formatting will be stripped."
+            />
+          </div>
+        </div>
+
+        <div className="tool-pane">
+          <div className="tool-pane-header">
+            <span>Cleaned Text</span>
+            <button className="btn small primary" type="button" onClick={copyOut} title="Copy cleaned text">
+              Copy
+            </button>
+          </div>
+          <div className="tool-pane-content p-0">
+            <textarea 
+              className="textarea h-full border-0" 
+              style={{ borderRadius: 0 }}
+              value={output} 
+              readOnly 
+            />
+          </div>
+          <div className="p-2 border-t text-small text-muted flex gap-3">
+            <span>{output.length.toLocaleString()} chars</span>
+            <span>{output.split('\n').length.toLocaleString()} lines</span>
+          </div>
+        </div>
       </div>
     </div>
   );

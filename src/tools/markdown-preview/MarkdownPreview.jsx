@@ -220,14 +220,28 @@ export default function MarkdownPreview() {
       
       const editor = editorRef.current;
       const preview = previewRef.current;
+      console.log('Editor scroll fired', { editor, preview });
       if (!editor || !preview) return;
 
       const eDen = editor.scrollHeight - editor.clientHeight;
       const pDen = preview.scrollHeight - preview.clientHeight;
+      console.log('Scroll calc:', { 
+        editorScrollTop: editor.scrollTop,
+        editorScrollHeight: editor.scrollHeight,
+        editorClientHeight: editor.clientHeight,
+        eDen,
+        previewScrollHeight: preview.scrollHeight,
+        previewClientHeight: preview.clientHeight,
+        pDen
+      });
       
       if (eDen > 0 && pDen > 0) {
         const scrollPercent = editor.scrollTop / eDen;
-        preview.scrollTop = scrollPercent * pDen;
+        const targetScrollTop = scrollPercent * pDen;
+        console.log('Setting preview scrollTop to:', targetScrollTop);
+        preview.scrollTop = targetScrollTop;
+        console.log('Preview scrollTop after setting:', preview.scrollTop);
+        console.log('Preview element:', preview, 'overflow:', window.getComputedStyle(preview).overflow);
       }
     } else { // scroller === 'preview'
       if (activeScrollerRef.current === 'editor') return;
@@ -289,8 +303,8 @@ export default function MarkdownPreview() {
           <div className="tool-pane-content p-0" style={{ overflow: 'hidden' }}>
             <textarea
               ref={editorRef}
-              className="mdp-editor textarea h-full border-0"
-              style={{border:0, borderRadius:0, resize: 'none'}}
+              className="mdp-editor textarea border-0"
+              style={{border:0, borderRadius:0, resize: 'none', overflow: 'auto', height: '100%', width: '100%', display: 'block'}}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onPaste={handlePaste}
@@ -303,8 +317,8 @@ export default function MarkdownPreview() {
         </div>
         <div className="tool-pane">
           <div className="tool-pane-header">Preview</div>
-          <div className="tool-pane-content p-0">
-            <div ref={previewRef} className="mdp-preview h-full overflow-auto p-4" onScroll={onPreviewScroll}>
+          <div className="tool-pane-content p-0" style={{ overflow: 'hidden' }}>
+            <div ref={previewRef} className="mdp-preview p-4" style={{ height: '100%', width: '100%', overflow: 'auto' }} onScroll={onPreviewScroll}>
               <article className="mdp-content" dangerouslySetInnerHTML={{ __html: html }} />
             </div>
           </div>

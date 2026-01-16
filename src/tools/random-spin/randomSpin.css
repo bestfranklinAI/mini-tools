@@ -1,9 +1,50 @@
 /* RandomSpin tool styles - scoped and using shared primitives */
 
+.randomspin .rs-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: var(--space-3);
+  height: 100%;
+  overflow: hidden; /* Main container fixed height */
+  padding: var(--space-3);
+}
+
+@media (max-width: 900px) {
+  .randomspin .rs-layout {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .randomspin .rs-panel-input {
+    flex: 0 0 auto;
+    max-height: 40%;
+  }
+  .randomspin .rs-panel-wheel {
+    flex: 1;
+    min-height: 0;
+  }
+}
+
+.randomspin .rs-panel-input {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.randomspin .rs-panel-wheel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Input Section */
 .randomspin .rs-input-row {
   display: grid;
   grid-template-columns: 1fr auto auto;
   gap: var(--space-2);
+  margin-bottom: var(--space-2);
 }
 
 @media (max-width: 560px) {
@@ -16,8 +57,10 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
-  margin-top: var(--space-2);
   min-height: 36px;
+  overflow-y: auto;
+  padding-bottom: 4px;
+  align-content: start;
 }
 
 .randomspin .chip.hit {
@@ -46,19 +89,30 @@
   background: color-mix(in oklab, var(--danger) 8%, transparent);
 }
 
+/* Wheel Section */
 .randomspin .rs-grid {
   display: grid;
-  grid-template-columns: 1fr 0.8fr;
+  grid-template-columns: 1fr;
   gap: var(--space-3);
   align-items: start;
+  height: 100%;
+  overflow-y: auto;
 }
 
-@media (max-width: 980px) {
-  .randomspin .rs-grid { grid-template-columns: 1fr; }
+.randomspin .rs-wheel-col { 
+  display: flex; 
+  flex-direction: column; 
+  gap: var(--space-3); 
+  align-items: center;
 }
 
-.randomspin .rs-wheel-col { display: flex; flex-direction: column; gap: var(--space-3); }
-.randomspin .rs-actions { display: flex; align-items: center; gap: var(--space-3); }
+.randomspin .rs-actions { 
+  display: flex; 
+  align-items: center; 
+  gap: var(--space-3); 
+  width: 100%;
+  justify-content: center;
+}
 
 .randomspin .rs-winner .badge {
   border-color: var(--accent);
@@ -79,18 +133,18 @@
 .randomspin .rs-wheel-container {
   position: relative;
   width: 100%;
-  max-width: 360px;
+  max-width: 320px; /* Reduced to fit better */
   aspect-ratio: 1;
   margin: 0 auto;
 }
 
 @media (max-width: 700px) {
-  .randomspin .rs-wheel-container { max-width: min(78vw, 340px); }
+  .randomspin .rs-wheel-container { max-width: min(78vw, 280px); }
 }
 
 .randomspin .rs-pointer {
   position: absolute;
-  top: -10px;
+  top: -12px;
   left: 50%;
   transform: translateX(-50%);
   width: 0; height: 0;
@@ -99,15 +153,6 @@
   border-bottom: 22px solid var(--accent);
   filter: drop-shadow(0 2px 6px var(--shadow));
   z-index: 3;
-}
-
-@media (max-width: 700px) {
-  .randomspin .rs-pointer {
-    border-left-width: 10px;
-    border-right-width: 10px;
-    border-bottom-width: 16px;
-    top: -8px;
-  }
 }
 
 .randomspin .rs-wheel {
@@ -137,21 +182,27 @@
 }
 
 /* Legend */
+.randomspin .rs-legend-col {
+  width: 100%;
+}
+
 .randomspin .rs-legend {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-2);
-  align-content: start;
+  justify-content: center;
 }
 
 .randomspin .rs-legend-item {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: 8px 10px;
+  padding: 6px 10px;
   border: 1px solid var(--border);
   background: var(--bg-elev);
   border-radius: var(--radius-sm);
+  font-size: 13px;
+  max-width: 100%;
 }
 
 .randomspin .rs-legend-item.hit {
@@ -159,5 +210,5 @@
   box-shadow: var(--shadow-1);
 }
 
-.randomspin .rs-swatch { width: 14px; height: 14px; border-radius: 4px; box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--bg) 40%, transparent); }
+.randomspin .rs-swatch { width: 12px; height: 12px; border-radius: 4px; flex-shrink: 0; }
 .randomspin .rs-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

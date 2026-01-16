@@ -112,14 +112,14 @@ export default function RandomSpin() {
     <div className="tool randomspin">
       <ToolHeader title="Random Spin" subtitle="Add names, spin the wheel, pick a winner" />
 
-  <div className="tool-content compact">
-        <div className="tool-section">
+      <div className="tool-content rs-layout">
+        <div className="tool-section rs-panel-input">
           <div className="section-header">Add names</div>
           <div className="section-body">
             <div className="rs-input-row">
               <input
                 className="input"
-                placeholder="Type names, press Enter, or paste comma/newline separated"
+                placeholder="Type names..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={onKeyDown}
@@ -149,7 +149,7 @@ export default function RandomSpin() {
           </div>
         </div>
 
-        <div className="tool-section">
+        <div className="tool-section rs-panel-wheel">
           <div className="section-header">Wheel</div>
           <div className="section-body">
             <div className="rs-grid">
@@ -179,9 +179,9 @@ export default function RandomSpin() {
                   {cleaned.length === 0 && (
                     <div className="muted">Legend will appear once you add names.</div>
                   )}
-          {cleaned.map((n, i) => (
+                  {cleaned.map((n, i) => (
                     <div key={`${n}-${i}`} className={`rs-legend-item${winner === n ? ' hit' : ''}`}>
-            <span className="rs-swatch" style={{ background: palette[i] }} />
+                      <span className="rs-swatch" style={{ background: palette[i] }} />
                       <span className="rs-name">{n}</span>
                     </div>
                   ))}

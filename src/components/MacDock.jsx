@@ -1,13 +1,53 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Home as HomeIcon } from 'lucide-react';
 import ToolRegistry from '../core/ToolRegistry';
+import Settings from '../core/Settings';
 
 export default function MacDock({ currentId, onPick }) {
-  const tools = useMemo(() => ToolRegistry.list(), []);
+  const [limit, setLimit] = useState(15);
+  const [dockTools, setDockTools] = useState([]);
   const ref = useRef(null);
   const itemRefs = useRef([]);
   const [mouseX, setMouseX] = useState(null);
   const [bouncing, setBouncing] = useState(null);
+
+  // Responsive limit
+  useEffect(() => {
+    const updateLimit = () => {
+      setLimit(window.innerWidth < 640 ? 5 : 15);
+    };
+    updateLimit();
+    window.addEventListener('resize', updateLimit);
+    return () => window.removeEventListener('resize', updateLimit);
+  }, []);
+
+  // Sync dock items with Settings (Recents + Favorites)
+  useEffect(() => {
+    const updateItems = () => {
+      const { recents = [], favorites = [] } = Settings.getUI();
+      const all = ToolRegistry.list();
+      
+      // Build unique list: Favorites first, then Recents
+      const ids = new Set(favorites);
+      recents.forEach(r => ids.add(r.id));
+      
+      // If empty, seed with first few available tools to avoid empty dock
+      if (ids.size === 0) {
+        all.slice(0, 4).forEach(t => ids.add(t.id));
+      }
+
+      // Convert IDs to Tool objects
+      const items = Array.from(ids)
+        .map(id => all.find(t => t.id === id))
+        .filter(Boolean); // remove if not found in registry
+
+      // Apply limit (prioritizing the set order: Favs then Recents)
+      setDockTools(items.slice(0, limit));
+    };
+
+    updateItems(); // Initial load
+    return Settings.onChange(updateItems); // Listen for usage updates
+  }, [limit]);
 
   const onMouseMove = (e) => {
     const rect = ref.current?.getBoundingClientRect();
@@ -45,7 +85,7 @@ export default function MacDock({ currentId, onPick }) {
           if (mouseX != null && ref.current) {
             const containerRect = ref.current.getBoundingClientRect();
             let best = { d: Infinity, i: null };
-            tools.forEach((_, i) => {
+            dockTools.forEach((_, i) => {
               const el = itemRefs.current[i];
               const elRect = el?.getBoundingClientRect();
               const center = elRect ? (elRect.left - containerRect.left) + elRect.width / 2 : (i + 0.5) * (base + 12);
@@ -58,7 +98,7 @@ export default function MacDock({ currentId, onPick }) {
           const scaleByTier = [1.2, 1.1, 1.05];
           const liftByTier = [16, 9, 4];
 
-          return tools.map((t, idx) => {
+          return dockTools.map((t, idx) => {
             const tier = hoverIdx == null ? Infinity : Math.abs(idx - hoverIdx);
             const scale = tier === Infinity ? 1 : (scaleByTier[tier] ?? 1);
             const lift = tier === Infinity ? 0 : (liftByTier[tier] ?? 0);
@@ -72,7 +112,7 @@ export default function MacDock({ currentId, onPick }) {
                 style={{ width: base, height: base, transform: `translateY(${-lift}px) scale(${scale})`, zIndex: Math.round(100 + (3 - Math.min(tier, 3)) * 10) }}
                 title={t.name}
                 aria-label={`Open ${t.name}`}
-                onMouseEnter={() => { try { ToolRegistry.getImporter(t.id)?.(); } catch {} }}
+                onMouseEnter={() => { try { ToolRegistry.getImporter(t.id)?.(); } catch { /* ignore */ } }}
               >
                 {/* icon path relative to tool dir */}
                 <ToolIcon dir={t.dir} iconPath={t.icon} size={Math.max(22, base - 22)} />
