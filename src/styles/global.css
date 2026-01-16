@@ -52,6 +52,14 @@ body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI
   overflow: auto;
 }
 
+/* Increase padding on smaller screens to prevent dock overlap */
+@media (max-width: 640px) {
+  .content {
+    padding: 10px;
+    padding-bottom: calc(30px + var(--dock-height));
+  }
+}
+
 .tool-stage {
   max-width: 1500px; 
   margin: 0 auto; 
@@ -68,8 +76,18 @@ body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI
   flex-direction: column;
 }
 
-.dock-wrap { position: fixed; left: 0; right: 0; bottom: 0; padding: 14px 0 calc(22px + env(safe-area-inset-bottom, 0px)); backdrop-filter: saturate(120%) blur(10px); background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.28)); pointer-events: none; }
+.dock-wrap { position: fixed; left: 0; right: 0; bottom: 0; padding: 14px 0 calc(22px + env(safe-area-inset-bottom, 0px)); backdrop-filter: saturate(120%) blur(10px); background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.28)); pointer-events: none; z-index: 40; }
 .dock { pointer-events: auto; display: flex; gap: 12px; justify-content: center; align-items: flex-end; }
+
+/* Responsive dock adjustments for narrow screens */
+@media (max-width: 640px) {
+  .dock-wrap {
+    padding: 10px 0 calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+  .dock {
+    gap: 8px;
+  }
+}
 .dock-item { border-radius: 14px; border: 1px solid var(--border); background: var(--bg-elev); padding: 8px; cursor: pointer; display: grid; place-items: center; box-shadow: 0 4px 16px var(--shadow); transition: transform 120ms ease, box-shadow 160ms ease, border-color 160ms ease, background-color 160ms ease; position: relative; will-change: transform; transform-origin: bottom center; }
 .dock-item { animation: dock-in 220ms ease-out; }
 .dock-item.active { border-color: var(--accent); box-shadow: 0 8px 24px var(--shadow); }
@@ -100,7 +118,6 @@ body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI
 
 /* Responsive tools container */
 @media (max-width: 700px) {
-  .content { padding: 10px; }
   .tool-stage { border-radius: 10px; }
 }
 
@@ -204,3 +221,10 @@ body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI
 
 /* Toasts stack spacing above dock */
 .toasts { position: fixed; right: 16px; bottom: calc(var(--dock-height) + 16px); display: grid; gap: 10px; z-index: 80; }
+
+@media (max-width: 640px) {
+  .toasts {
+    right: 10px;
+    bottom: calc(var(--dock-height) + 10px);
+  }
+}

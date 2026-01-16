@@ -27,22 +27,42 @@ export default function MacDock({ currentId, onPick }) {
       const { recents = [], favorites = [] } = Settings.getUI();
       const all = ToolRegistry.list();
       
-      // Build unique list: Favorites first, then Recents
-      const ids = new Set(favorites);
-      recents.forEach(r => ids.add(r.id));
+      // Build list prioritizing: Favorites first, then most recent tools
+      const seen = new Set();
+      const items = [];
+      
+      // Add favorites first (respecting limit)
+      for (const favId of favorites) {
+        if (items.length >= limit) break;
+        const tool = all.find(t => t.id === favId);
+        if (tool && !seen.has(favId)) {
+          items.push(tool);
+          seen.add(favId);
+        }
+      }
+      
+      // Fill remaining slots with recent tools (sorted by most recent)
+      const sortedRecents = [...recents].sort((a, b) => b.lastUsed - a.lastUsed);
+      for (const r of sortedRecents) {
+        if (items.length >= limit) break;
+        if (!seen.has(r.id)) {
+          const tool = all.find(t => t.id === r.id);
+          if (tool) {
+            items.push(tool);
+            seen.add(r.id);
+          }
+        }
+      }
       
       // If empty, seed with first few available tools to avoid empty dock
-      if (ids.size === 0) {
-        all.slice(0, 4).forEach(t => ids.add(t.id));
+      if (items.length === 0) {
+        const seedLimit = Math.min(4, limit);
+        for (let i = 0; i < seedLimit && i < all.length; i++) {
+          items.push(all[i]);
+        }
       }
 
-      // Convert IDs to Tool objects
-      const items = Array.from(ids)
-        .map(id => all.find(t => t.id === id))
-        .filter(Boolean); // remove if not found in registry
-
-      // Apply limit (prioritizing the set order: Favs then Recents)
-      setDockTools(items.slice(0, limit));
+      setDockTools(items);
     };
 
     updateItems(); // Initial load
