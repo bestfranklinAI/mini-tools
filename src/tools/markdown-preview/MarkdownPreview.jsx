@@ -1,19 +1,13 @@
-import './markdownPreview.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import ToolHeader from '../../components/ToolHeader';
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js/lib/common';
 import markdownItKatex from 'markdown-it-katex';
 import 'katex/dist/katex.min.css';
+import 'highlight.js/styles/github.css';
 
 // Markdown Preview tool with synchronized scrolling between editor and preview.
 export default function MarkdownPreview() {
-  // Debug mode - can be toggled via button
-  const [debugMode, setDebugMode] = useState(false);
-  
-  const log = (...args) => {
-    if (debugMode) console.log('[MarkdownPreview]', ...args);
-  };
   // Create markdown-it instance with custom code renderers that embed data-line anchors for sync
   const md = useMemo(() => {
     const m = new MarkdownIt({
@@ -76,7 +70,7 @@ export default function MarkdownPreview() {
   });
 
   useEffect(() => {
-    try { localStorage.setItem('mdp:input', input); } catch {}
+    try { localStorage.setItem('mdp:input', input); } catch { /* ignore */ }
   }, [input]);
 
   // Render with line anchors using markdown-it tokens
@@ -185,12 +179,6 @@ export default function MarkdownPreview() {
     const normalized = normalizeMathDelimiters(input || '');
     const tokens = md.parse(normalized, env);
     // Add data-line attribute to all block-level tokens for better sync
-    for (let i = 0; i < tokens.length; i++) {
-      const t = tokens[i];
-      if (t.map && (t.type.endsWith('_open') || t.level === 0)) {
-        t.attrSet('data-line', String(t.map[0] + 1)); // Use 1-based line numbers
-      }
-    }
     return md.renderer.render(tokens, md.options, env);
   }, [md, input]);
 
@@ -221,7 +209,7 @@ export default function MarkdownPreview() {
       try {
         const pos = start + converted.length;
         ta.selectionStart = ta.selectionEnd = pos;
-      } catch {}
+      } catch { /* ignore */ }
     }, 0);
   };
 
@@ -233,17 +221,14 @@ export default function MarkdownPreview() {
       const editor = editorRef.current;
       const preview = previewRef.current;
       if (!editor || !preview) return;
-      const eScrollable = editor.scrollHeight > editor.clientHeight + 1;
-      const pScrollable = preview.scrollHeight > preview.clientHeight + 1;
-      if (!eScrollable || !pScrollable) {
-        // If either side can't scroll, skip syncing to avoid NaN/Inf
-        return;
-      }
+
       const eDen = editor.scrollHeight - editor.clientHeight;
       const pDen = preview.scrollHeight - preview.clientHeight;
-      if (eDen <= 0 || pDen <= 0) return;
-      const scrollPercent = editor.scrollTop / eDen;
-      preview.scrollTop = scrollPercent * pDen;
+      
+      if (eDen > 0 && pDen > 0) {
+        const scrollPercent = editor.scrollTop / eDen;
+        preview.scrollTop = scrollPercent * pDen;
+      }
     } else { // scroller === 'preview'
       if (activeScrollerRef.current === 'editor') return;
       activeScrollerRef.current = 'preview';
@@ -251,16 +236,14 @@ export default function MarkdownPreview() {
       const editor = editorRef.current;
       const preview = previewRef.current;
       if (!editor || !preview) return;
-      const eScrollable = editor.scrollHeight > editor.clientHeight + 1;
-      const pScrollable = preview.scrollHeight > preview.clientHeight + 1;
-      if (!eScrollable || !pScrollable) {
-        return;
-      }
+
       const eDen = editor.scrollHeight - editor.clientHeight;
       const pDen = preview.scrollHeight - preview.clientHeight;
-      if (eDen <= 0 || pDen <= 0) return;
-      const scrollPercent = preview.scrollTop / pDen;
-      editor.scrollTop = scrollPercent * eDen;
+      
+      if (eDen > 0 && pDen > 0) {
+        const scrollPercent = preview.scrollTop / pDen;
+        editor.scrollTop = scrollPercent * eDen;
+      }
     }
 
     clearTimeout(scrollTimeoutRef.current);
@@ -297,26 +280,33 @@ export default function MarkdownPreview() {
   }, [html]);
 
   return (
-    <div className="tool mdp-wrap">
+    <div className="tool-root mdp-wrap">
       <ToolHeader title="Markdown Preview" subtitle="Live preview with synchronized scroll" />
 
-  <div className="mdp-split">
-        <div className="mdp-pane">
-          <textarea
-            ref={editorRef}
-            className="mdp-editor"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onPaste={handlePaste}
-            onScroll={onEditorScroll}
-            wrap="soft"
-            spellCheck="false"
-            placeholder="Write Markdown here…"
-          />
+      <div className="tool-split">
+        <div className="tool-pane">
+          <div className="tool-pane-header">Editor</div>
+          <div className="tool-pane-content p-0" style={{ overflow: 'hidden' }}>
+            <textarea
+              ref={editorRef}
+              className="mdp-editor textarea h-full border-0"
+              style={{border:0, borderRadius:0, resize: 'none'}}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onPaste={handlePaste}
+              onScroll={onEditorScroll}
+              wrap="soft"
+              spellCheck="false"
+              placeholder="Write Markdown here…"
+            />
+          </div>
         </div>
-        <div className="mdp-pane">
-          <div ref={previewRef} className="mdp-preview" onScroll={onPreviewScroll}>
-            <article className="mdp-content" dangerouslySetInnerHTML={{ __html: html }} />
+        <div className="tool-pane">
+          <div className="tool-pane-header">Preview</div>
+          <div className="tool-pane-content p-0">
+            <div ref={previewRef} className="mdp-preview h-full overflow-auto p-4" onScroll={onPreviewScroll}>
+              <article className="mdp-content" dangerouslySetInnerHTML={{ __html: html }} />
+            </div>
           </div>
         </div>
       </div>
@@ -359,5 +349,5 @@ Inline math with \\( ... \\): e.g., \\(a_i = x^2 + y_1\\) and subscripts/supersc
 
 Display math with \\[ ... \\]:
 
-\\[ \int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi} \\]
+\\[ \\int_{-\\infty}^{\\infty} e^{-x^2} \\, dx = \\sqrt{\\pi} \\]
 `;
